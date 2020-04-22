@@ -1,0 +1,708 @@
+﻿country,log_new_cases_past_week,log_total_cases
+Netherlands,3.85,4.34
+Netherlands,3.84,4.31
+Netherlands,3.84,4.29
+Netherlands,3.85,4.27
+Netherlands,3.84,4.25
+Netherlands,3.84,4.22
+Netherlands,3.85,4.2
+Netherlands,3.86,4.17
+Netherlands,3.86,4.13
+Netherlands,3.85,4.1
+Netherlands,3.85,4.07
+Netherlands,3.82,4.04
+Netherlands,3.79,3.99
+Netherlands,3.75,3.93
+Netherlands,3.7,3.87
+Netherlands,3.64,3.81
+Netherlands,3.59,3.75
+Netherlands,3.52,3.68
+Netherlands,3.49,3.62
+Netherlands,3.43,3.56
+Netherlands,3.34,3.48
+Netherlands,3.27,3.39
+Netherlands,3.19,3.31
+Netherlands,3.12,3.23
+Netherlands,3.04,3.15
+Netherlands,2.94,3.05
+Netherlands,2.89,2.98
+Netherlands,2.83,2.91
+Netherlands,2.73,2.79
+Netherlands,2.67,2.7
+Netherlands,2.56,2.58
+Netherlands,2.48,2.51
+Netherlands,2.4,2.42
+Netherlands,2.24,2.27
+Netherlands,2.06,2.11
+Netherlands,1.85,1.91
+Netherlands,1.45,1.58
+Netherlands,1.11,1.38
+Netherlands,0.85,1
+Netherlands,0.6,0
+Netherlands,0.48,0
+Netherlands,0.3,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Netherlands,0,0
+Australia,2.93,3.79
+Australia,2.99,3.79
+Australia,3.06,3.78
+Australia,3.13,3.77
+Australia,3.19,3.76
+Australia,3.23,3.76
+Australia,3.28,3.74
+Australia,3.34,3.73
+Australia,3.37,3.71
+Australia,3.39,3.69
+Australia,3.38,3.66
+Australia,3.40,3.63
+Australia,3.42,3.60
+Australia,3.41,3.56
+Australia,3.36,3.50
+Australia,3.32,3.45
+Australia,3.27,3.39
+Australia,3.23,3.33
+Australia,3.13,3.24
+Australia,3.04,3.13
+Australia,2.92,3.03
+Australia,2.83,2.94
+Australia,2.74,2.85
+Australia,2.64,2.75
+Australia,2.53,2.66
+Australia,2.45,2.58
+Australia,2.23,2.39
+Australia,2.24,2.39
+Australia,2.13,2.30
+Australia,1.98,2.19
+Australia,1.88,2.10
+Australia,1.85,2.05
+Australia,1.77,1.96
+Australia,1.71,1.90
+Australia,1.70,1.86
+Australia,1.67,1.80
+Australia,1.64,1.78
+Australia,1.56,1.72
+Australia,1.40,1.61
+Australia,1.23,1.52
+Australia,1.11,1.46
+Australia,1.00,1.36
+Australia,0.48,1.20
+Australia,0.48,1.20
+Australia,0.48,1.20
+Australia,0.48,1.20
+Australia,0.48,1.20
+Australia,0.48,1.20
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,0.00,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Australia,1.11,1.11
+Germany,4.53,5.06
+Germany,4.54,5.03
+Germany,4.55,5.01
+Germany,4.57,5.00
+Germany,4.58,4.98
+Germany,4.59,4.96
+Germany,4.57,4.93
+Germany,4.57,4.9
+Germany,4.57,4.87
+Germany,4.55,4.83
+Germany,4.54,4.79
+Germany,4.54,4.76
+Germany,4.53,4.72
+Germany,4.5,4.69
+Germany,4.45,4.63
+Germany,4.41,4.56
+Germany,4.37,4.5
+Germany,4.31,4.44
+Germany,4.22,4.36
+Germany,4.14,4.27
+Germany,4.11,4.22
+Germany,4.04,4.14
+Germany,3.94,4.04
+Germany,3.8,3.91
+Germany,3.76,3.85
+Germany,3.69,3.78
+Germany,3.6,3.68
+Germany,3.49,3.58
+Germany,3.4,3.49
+Germany,3.31,3.37
+Germany,3.22,3.28
+Germany,3.1,3.16
+Germany,2.98,3.05
+Germany,2.86,2.93
+Germany,2.79,2.84
+Germany,2.68,2.73
+Germany,2.51,2.54
+Germany,2.34,2.38
+Germany,2.23,2.27
+Germany,2.13,2.18
+Germany,2.07,2.07
+Germany,1.82,1.82
+Germany,1.72,1.72
+Germany,1.41,1.41
+Germany,1.32,1.32
+Germany,1.26,1.26
+Germany,1.2,1.2
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+Germany,0,0
+China,2.5,4.91
+China,2.49,4.91
+China,2.41,4.91
+China,2.35,4.91
+China,2.43,4.91
+China,2.36,4.91
+China,2.39,4.91
+China,2.4,4.91
+China,2.43,4.91
+China,2.51,4.91
+China,2.54,4.91
+China,2.54,4.91
+China,2.59,4.91
+China,2.59,4.91
+China,2.57,4.91
+China,2.55,4.91
+China,2.51,4.91
+China,2.46,4.91
+China,2.37,4.91
+China,2.32,4.91
+China,2.26,4.91
+China,2.19,4.91
+China,2.13,4.91
+China,2.06,4.91
+China,2.1,4.91
+China,2.1,4.91
+China,2.17,4.91
+China,2.24,4.91
+China,2.42,4.91
+China,2.58,4.91
+China,2.71,4.91
+China,2.78,4.91
+China,2.85,4.91
+China,2.94,4.91
+China,3.15,4.91
+China,3.24,4.91
+China,3.28,4.91
+China,3.34,4.9
+China,3.4,4.9
+China,3.46,4.9
+China,3.46,4.9
+China,3.47,4.9
+China,3.53,4.9
+China,3.59,4.89
+China,3.59,4.89
+China,3.72,4.89
+China,3.82,4.89
+China,3.93,4.89
+China,3.99,4.88
+China,4.06,4.88
+China,4.2,4.87
+China,4.47,4.87
+China,4.47,4.86
+China,4.48,4.85
+China,4.5,4.84
+China,4.5,4.82
+China,4.51,4.81
+China,4.49,4.77
+China,4.31,4.65
+China,4.35,4.63
+China,4.36,4.6
+China,4.36,4.57
+China,4.36,4.54
+China,4.33,4.49
+China,4.31,4.45
+China,4.26,4.39
+China,4.2,4.31
+China,4.16,4.24
+China,4.09,4.16
+China,4.02,4.07
+China,3.95,3.99
+China,3.85,3.89
+China,3.73,3.78
+China,3.6,3.65
+China,3.34,3.44
+China,3.15,3.3
+China,2.85,3.11
+China,2.41,2.92
+Italy,4.45,5.16
+Italy,4.46,5.14
+Italy,4.47,5.13
+Italy,4.49,5.12
+Italy,4.49,5.11
+Italy,4.51,5.1
+Italy,4.52,5.08
+Italy,4.54,5.06
+Italy,4.56,5.04
+Italy,4.56,5.02
+Italy,4.58,5.01
+Italy,4.59,4.99
+Italy,4.59,4.97
+Italy,4.6,4.94
+Italy,4.6,4.91
+Italy,4.59,4.87
+Italy,4.58,4.84
+Italy,4.56,4.81
+Italy,4.54,4.77
+Italy,4.51,4.73
+Italy,4.47,4.67
+Italy,4.41,4.61
+Italy,4.37,4.55
+Italy,4.33,4.5
+Italy,4.27,4.45
+Italy,4.24,4.39
+Italy,4.18,4.33
+Italy,4.11,4.25
+Italy,4.05,4.18
+Italy,3.97,4.1
+Italy,3.88,4.01
+Italy,3.85,3.96
+Italy,3.75,3.87
+Italy,3.68,3.77
+Italy,3.57,3.67
+Italy,3.51,3.59
+Italy,3.42,3.49
+Italy,3.34,3.4
+Italy,3.26,3.31
+Italy,3.19,3.23
+Italy,3.02,3.05
+Italy,2.94,2.95
+Italy,2.81,2.82
+Italy,2.67,2.67
+Italy,2.51,2.51
+Italy,2.35,2.36
+Italy,2.19,2.2
+Italy,1.88,1.9
+Italy,1.32,1.32
+Italy,0.6,0.6
+Italy,0.48,0.48
+Italy,0.48,0.48
+Italy,0.48,0.48
+Italy,0.48,0.48
+Italy,0.48,0.48
+Spain,4.58,5.2
+Spain,4.61,5.18
+Spain,4.64,5.17
+Spain,4.66,5.15
+Spain,4.69,5.14
+Spain,4.71,5.12
+Spain,4.71,5.1
+Spain,4.72,5.07
+Spain,4.72,5.05
+Spain,4.73,5.02
+Spain,4.72,4.98
+Spain,4.71,4.94
+Spain,4.7,4.9
+Spain,4.68,4.86
+Spain,4.64,4.82
+Spain,4.6,4.76
+Spain,4.54,4.69
+Spain,4.48,4.62
+Spain,4.4,4.55
+Spain,4.32,4.46
+Spain,4.28,4.41
+Spain,4.21,4.33
+Spain,4.17,4.26
+Spain,4.1,4.17
+Spain,4.01,4.07
+Spain,3.94,4
+Spain,3.86,3.9
+Spain,3.77,3.81
+Spain,3.68,3.72
+Spain,3.46,3.5
+Spain,3.31,3.36
+Spain,3.19,3.23
+Spain,3.05,3.09
+Spain,2.78,2.83
+Spain,2.68,2.72
+Spain,2.58,2.6
+Spain,2.43,2.45
+Spain,2.33,2.36
+Spain,2.19,2.22
+Spain,2.07,2.08
+Spain,1.91,1.92
+Spain,1.75,1.76
+Spain,1.49,1.52
+Spain,1.36,1.4
+Spain,1.04,1.11
+Spain,0.85,0.95
+Spain,0,0.48
+Spain,0,0.3
+Spain,0,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+Spain,0.3,0.3
+USA,5.34,5.66
+USA,5.33,5.63
+USA,5.32,5.6
+USA,5.3,5.56
+USA,5.28,5.52
+USA,5.26,5.49
+USA,5.23,5.44
+USA,5.19,5.38
+USA,5.16,5.33
+USA,5.12,5.27
+USA,5.07,5.21
+USA,5.03,5.15
+USA,5,5.09
+USA,4.93,5.02
+USA,4.86,4.93
+USA,4.77,4.83
+USA,4.69,4.74
+USA,4.59,4.64
+USA,4.48,4.53
+USA,4.33,4.38
+USA,4.24,4.29
+USA,4.08,4.14
+USA,3.9,3.96
+USA,3.73,3.8
+USA,3.59,3.66
+USA,3.49,3.56
+USA,3.37,3.44
+USA,3.27,3.34
+USA,3.15,3.21
+USA,3.06,3.11
+USA,2.94,3
+USA,2.78,2.85
+USA,2.67,2.73
+USA,2.56,2.64
+USA,2.41,2.5
+USA,2.21,2.34
+USA,1.99,2.2
+USA,1.83,2.09
+USA,1.67,2
+USA,1.6,1.88
+USA,1.52,1.83
+USA,1.45,1.8
+USA,1.65,1.78
+USA,1.65,1.78
+USA,1.62,1.76
+USA,1.58,1.72
+USA,1.3,1.54
+USA,1.3,1.54
+USA,1.54,1.54
+USA,1.18,1.18
+USA,1.18,1.18
+USA,1.18,1.18
+USA,1.18,1.18
+USA,1.18,1.18
+USA,1.18,1.18
+UK,4.5,4.81
+UK,4.49,4.78
+UK,4.48,4.74
+UK,4.47,4.71
+UK,4.45,4.68
+UK,4.39,4.62
+UK,4.37,4.58
+UK,4.34,4.53
+UK,4.30,4.47
+UK,4.23,4.40
+UK,4.19,4.35
+UK,4.14,4.29
+UK,4.08,4.23
+UK,4.02,4.16
+UK,3.92,4.07
+UK,3.84,3.98
+UK,3.79,3.91
+UK,3.71,3.82
+UK,3.63,3.75
+UK,3.60,3.71
+UK,3.50,3.60
+UK,3.43,3.51
+UK,3.34,3.42
+UK,3.20,3.29
+UK,3.09,3.19
+UK,3.05,3.14
+UK,2.93,3.03
+UK,2.80,2.90
+UK,2.68,2.77
+UK,2.57,2.66
+UK,2.51,2.57
+UK,2.45,2.51
+UK,2.37,2.43
+UK,2.26,2.31
+UK,2.15,2.20
+UK,2.00,2.06
+UK,1.86,1.93
+UK,1.58,1.71
+UK,1.43,1.60
+UK,1.41,1.54
+UK,1.15,1.36
+UK,1.00,1.28
+UK,0.60,1.11
+UK,0.60,1.11
+UK,0.60,1.11
+UK,0.60,1.11
+UK,0.00,0.95
+UK,0.00,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+UK,0.95,0.95
+France,4.44,4.94
+France,4.40,4.91
+France,4.42,4.89
+France,4.47,4.87
+France,4.48,4.85
+France,4.49,4.84
+France,4.50,4.81
+France,4.48,4.77
+France,4.50,4.76
+France,4.47,4.72
+France,4.39,4.65
+France,4.37,4.60
+France,4.36,4.57
+France,4.31,4.52
+France,4.26,4.46
+France,4.21,4.40
+France,4.16,4.35
+France,4.12,4.30
+France,4.05,4.22
+France,4.00,4.16
+France,3.95,4.10
+France,3.91,4.04
+France,3.84,3.96
+France,3.77,3.89
+France,3.72,3.82
+France,3.63,3.73
+France,3.55,3.65
+France,3.48,3.56
+France,3.39,3.46
+France,3.30,3.36
+France,3.20,3.25
+France,3.09,3.15
+France,3.00,3.05
+France,2.93,2.98
+France,2.74,2.79
+France,2.59,2.63
+France,2.43,2.45
+France,2.30,2.33
+France,2.28,2.28
+France,2.11,2.11
+France,2.00,2.00
+France,1.76,1.76
+France,1.58,1.58
+France,1.26,1.26
+France,1.11,1.11
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+France,0.00,0.00
+Norway,3.09,3.79
+Norway,3.13,3.78
+Norway,3.15,3.77
+Norway,3.18,3.76
+Norway,3.19,3.75
+Norway,3.22,3.74
+Norway,3.21,3.72
+Norway,3.25,3.69
+Norway,3.24,3.67
+Norway,3.27,3.65
+Norway,3.27,3.63
+Norway,3.29,3.61
+Norway,3.28,3.58
+Norway,3.26,3.55
+Norway,3.21,3.50
+Norway,3.17,3.46
+Norway,3.10,3.41
+Norway,3.08,3.37
+Norway,3.02,3.33
+Norway,3.01,3.28
+Norway,3.00,3.24
+Norway,2.97,3.19
+Norway,2.97,3.15
+Norway,3.01,3.12
+Norway,2.99,3.07
+Norway,2.96,3.03
+Norway,2.88,2.96
+Norway,2.81,2.88
+Norway,2.73,2.79
+Norway,2.64,2.69
+Norway,2.38,2.44
+Norway,2.22,2.28
+Norway,2.17,2.22
+Norway,2.11,2.16
+Norway,2.02,2.05
+Norway,1.90,1.92
+Norway,1.72,1.73
+Norway,1.52,1.52
+Norway,1.40,1.40
+Norway,1.28,1.28
+Norway,1.18,1.18
+Norway,0.85,0.85
+Norway,0.60,0.60
+Norway,0.00,0.00
+Sweden,3.57,3.96
+Sweden,3.54,3.93
+Sweden,3.51,3.89
+Sweden,3.50,3.86
+Sweden,3.50,3.83
+Sweden,3.48,3.81
+Sweden,3.49,3.79
+Sweden,3.42,3.74
+Sweden,3.38,3.69
+Sweden,3.33,3.65
+Sweden,3.30,3.61
+Sweden,3.25,3.57
+Sweden,3.22,3.54
+Sweden,3.16,3.49
+Sweden,3.15,3.45
+Sweden,3.09,3.40
+Sweden,3.04,3.36
+Sweden,2.97,3.31
+Sweden,2.96,3.29
+Sweden,2.92,3.25
+Sweden,2.92,3.21
+Sweden,2.88,3.16
+Sweden,2.90,3.11
+Sweden,2.92,3.08
+Sweden,2.94,3.05
+Sweden,2.92,3.01
+Sweden,2.89,2.97
+Sweden,2.83,2.91
+Sweden,2.77,2.84
+Sweden,2.65,2.70
+Sweden,2.51,2.55
+Sweden,2.39,2.41
+Sweden,2.28,2.31
+Sweden,2.17,2.21
+Sweden,2.10,2.14
+Sweden,1.94,1.97
+Sweden,1.70,1.72
+Sweden,1.48,1.48
+Sweden,1.18,1.18
+Sweden,1.15,1.15
+Sweden,1.11,1.11
+Sweden,1.04,1.04
+Sweden,0.85,0.85
+Sweden,0.30,0.30
+New York City,4.43,4.94
+New York City,4.37,4.90
+New York City,4.42,4.90
+New York City,4.45,4.88
+New York City,4.45,4.86
+New York City,4.45,4.85
+New York City,4.45,4.82
+New York City,4.43,4.78
+New York City,4.43,4.75
+New York City,4.43,4.72
+New York City,4.40,4.68
+New York City,4.39,4.65
+New York City,4.38,4.62
+New York City,4.37,4.57
+New York City,4.36,4.52
+New York City,4.34,4.47
+New York City,4.31,4.41
+New York City,4.28,4.35
+New York City,4.26,4.30
+New York City,4.22,4.25
+New York City,4.12,4.14
+New York City,4.00,4.02
+New York City,3.86,3.87
+New York City,3.70,3.71
+New York City,3.47,3.47
+New York City,3.28,3.29
+New York City,3.11,3.12
+New York City,2.83,2.84
+New York City,2.51,2.53
+New York City,2.25,2.26
+New York City,2.04,2.04
+New York City,1.76,1.76
+New York City,1.57,1.57
+New York City,1.38,1.38
+New York City,1.20,1.20
+New York City,1.15,1.15
+New York City,0.60,0.60
+New York City,0.00,0.00
+New York State,4.83,5.20
+New York State,4.82,5.17
+New York State,4.80,5.14
+New York State,4.81,5.12
+New York State,4.80,5.09
+New York State,4.79,5.06
+New York State,4.77,5.01
+New York State,4.74,4.97
+New York State,4.72,4.92
+New York State,4.70,4.88
+New York State,4.66,4.82
+New York State,4.65,4.77
+New York State,4.62,4.72
+New York State,4.57,4.65
+New York State,4.52,4.57
+New York State,4.45,4.49
+New York State,4.39,4.41
+New York State,4.30,4.32
+New York State,4.16,4.18
+New York State,3.99,4.02
+New York State,3.82,3.85
+New York State,3.58,3.62
+New York State,3.34,3.38
+New York State,3.08,3.14
+New York State,2.91,2.98
+New York State,2.80,2.86
+New York State,2.73,2.79
+New York State,2.58,2.62
+New York State,2.48,2.51
+New York State,2.31,2.33
+New York State,2.23,2.24
+New York State,2.15,2.15
+New York State,2.02,2.02
+New York State,1.88,1.88
+New York State,1.64,1.64
+New York State,1.34,1.34
+New York State,1.04,1.04
+New York State,0.30,0.30
+New York State,0.00,0.00
