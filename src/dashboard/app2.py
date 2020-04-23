@@ -14,9 +14,7 @@ date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 ca = CoronaAnalysis(case_type='case', data_type='world')
 
 blerg, complete_data = ca.run_corona_analysis()
-
-print(complete_data.dtypes)
-
+print(complete_data.Date.dt.date.max())
 available_indicators = complete_data['indicator'].unique()
 
 app.layout = html.Div([
@@ -67,10 +65,10 @@ app.layout = html.Div([
 
     html.Div(dcc.Slider(
         id='crossfilter-year--slider',
-        min=complete_data['Date'].min(),
-        max=complete_data['Date'].max(),
-        value=complete_data['Date'].max(),
-        marks={str(year): str(year) for year in complete_data['Date'].unique()},
+        min=complete_data['Date'].dt.date.min(),
+        max=complete_data['Date'].dt.date.max(),
+        value=complete_data['Date'].dt.date.max(),
+        marks={str(date): str(date) for date in complete_data['Date'].unique()},
         step=None
     ), style={'width': '49%', 'padding': '0px 20px 20px 20px'})
 ])
@@ -144,8 +142,8 @@ def create_time_series(dff, axis_type, title):
     [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
      dash.dependencies.Input('crossfilter-xaxis-column', 'value'),
      dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
-def update_y_timeseries(hoverData, xaxis_column_name, axis_type):
-    country_name = hoverData['points'][0]['customdata']
+def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
+    country_name = hover_data['points'][0]['customdata']
     dff = complete_data[complete_data['Country/Region'] == country_name]
     dff = dff[dff['indicator'] == xaxis_column_name]
     title = f'<b>{country_name}</b><br>{xaxis_column_name}'
@@ -157,8 +155,8 @@ def update_y_timeseries(hoverData, xaxis_column_name, axis_type):
     [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
      dash.dependencies.Input('crossfilter-yaxis-column', 'value'),
      dash.dependencies.Input('crossfilter-yaxis-type', 'value')])
-def update_x_timeseries(hoverData, yaxis_column_name, axis_type):
-    dff = complete_data[complete_data['Country/Region'] == hoverData['points'][0]['customdata']]
+def update_x_timeseries(hover_data, yaxis_column_name, axis_type):
+    dff = complete_data[complete_data['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
 

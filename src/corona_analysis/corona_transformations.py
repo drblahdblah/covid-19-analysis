@@ -143,16 +143,21 @@ class CoronaTransformations:
         :param groupby_list:
         :return:
         """
-        df_to_transform['days_since_first_event'] = (df_to_transform
-                                                     .groupby(groupby_list)['Date']
-                                                     .transform(lambda x: (x - x.min()).dt.days)
-                                                     )
-        df_to_transform['avg_growth_rate'] = (df_to_transform
-                                              .groupby(groupby_list)['growth_rate']
-                                              .transform(lambda x: np.log(2) / (np.log(1) +
-                                                                                x.rolling(period).mean()))
-                                              )
-        df_to_transform['doubling_time'] = (df_to_transform.avg_growth_rate *
-                                            df_to_transform.days_since_first_event)
+        df_to_transform['Days since first case'] = (df_to_transform
+                                                    .groupby(groupby_list)['Date']
+                                                    .transform(lambda x: (x - x.min()).dt.days)
+                                                    )
+        df_to_transform['Average Growth Rate'] = (df_to_transform
+                                                  .groupby(groupby_list)['growth_rate']
+                                                  .transform(lambda x: np.log(2) /
+                                                                       (np.log(1) + np.where(x.rolling(period).mean()
+                                                                                             < 1,
+                                                                                             0,
+                                                                                             x.rolling(period).mean())
+                                                                        )
+                                                             )
+                                                  )
+        df_to_transform['Doubling time'] = (df_to_transform['Average Growth Rate'] *
+                                            df_to_transform['Days since first case'])
 
         return df_to_transform
