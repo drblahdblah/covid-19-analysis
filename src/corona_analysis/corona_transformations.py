@@ -85,10 +85,10 @@ class CoronaTransformations:
             exit(1)
 
         df_to_transform['slope_'+rise] = ((df_to_transform
-                                                   .groupby(groupby_list)[rise].diff(periods=period)) /
-                                                  (df_to_transform
-                                                   .groupby(groupby_list)[run].diff(periods=period))
-                                                  )
+                                           .groupby(groupby_list)[rise].diff(periods=period)) /
+                                          (df_to_transform
+                                           .groupby(groupby_list)[run].diff(periods=period))
+                                          )
         return df_to_transform
 
     def calculate_power_law_acceleration(self,

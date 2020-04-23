@@ -68,7 +68,7 @@ class CoronaAnalysis:
         return world_data
 
     @staticmethod
-    def run_corona_analysis():
+    def run_corona_analysis() -> tuple:
 
         date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 
@@ -76,9 +76,7 @@ class CoronaAnalysis:
         raw_data = corona_analysis.load_raw_data()
         melted_data = corona_analysis.melt_df(raw_data=raw_data)
         melted_data_dir = f'../data/output/data_at_state_level/{date_today}'
-        if not os.path.exists(melted_data_dir):
-            os.makedirs(melted_data_dir)
-        melted_data.to_csv(f'{melted_data_dir}/data_state_and_cases.csv')
+        CoronaAnalysis.write_to_csv(df_to_write=melted_data, path_to_write_to=melted_data_dir)
 
         cts = CoronaTransformations()
 
@@ -89,42 +87,44 @@ class CoronaAnalysis:
         cases_per_period = cts.create_cases_per_period(df_to_transform=total_cases_df,
                                                        groupby_list=groupby_list,
                                                        case_column='total_cases')
-        print(f"cases_per_period:\n {cases_per_period.head()}")
 
         rolling_avg = cts.create_rolling_average(df_to_transform=cases_per_period,
                                                  groupby_list=groupby_list,
                                                  period=7)
-        print(f"rolling_avg:\n {rolling_avg.head()}")
 
-        # def calculate_power_law_columns(df_to_transform, cols_to_logify: list) -> pd.DataFrame:
         power_law = cts.calculate_power_law_columns(df_to_transform=rolling_avg,
                                                     cols_to_logify=['total_cases', 'new_cases_per_week'])
-        print(f"power_law:\n {power_law.head()}")
 
         pl_slope = cts.calculate_power_law_slope(df_to_transform=power_law,
                                                  period=10,
                                                  groupby_list=groupby_list,
                                                  rise='log_new_cases_per_week',
                                                  run='log_total_cases')
-        print(f"pl_slope:\n {pl_slope.loc[pl_slope['Country/Region'] == 'Australia'].head(20)}")
 
         pl_acceleration = cts.calculate_power_law_acceleration(df_to_transform=pl_slope,
                                                                period=period,
                                                                groupby_list=groupby_list,
                                                                rise='slope_log_new_cases_per_week',
                                                                run='log_total_cases')
-        print(f"pl_acceleration:\n {pl_acceleration.loc[pl_acceleration['Country/Region'] == 'Australia'].head(20)}")
 
-        # def calculate_growth_rate(df_to_transform: pd.DataFrame, period: int, groupby_list: list, new_cases: str,
-        #                           total_cases: str) -> pd.DataFrame:
         df_gr = cts.calculate_growth_rate(df_to_transform=pl_acceleration,
                                           period=5,
                                           groupby_list=groupby_list,
                                           new_cases='new_cases',
                                           total_cases='total_cases')
-        print(f"df_gr:\n {df_gr.loc[df_gr['Country/Region'] == 'Australia'].head(20)}")
 
         df_dbl_time = cts.calculate_doubling_time(df_to_transform=df_gr,
                                                   period=5,
                                                   groupby_list=groupby_list)
-        print(f"df_dbl_time:\n {df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Australia'].head(20)}")
+        result_df_path = f'../data/output/complete_df/{date_today}'
+        CoronaAnalysis.write_to_csv(df_to_write=df_dbl_time, path_to_write_to=result_df_path)
+
+        stacked = df_dbl_time.set_index(['Date', 'Country/Region']).stack().reset_index()
+        stacked = stacked.rename(columns={"level_2": "indicator", 0: "value"})
+        return melted_data, stacked
+
+    @staticmethod
+    def write_to_csv(df_to_write: pd.DataFrame, path_to_write_to: str):
+        if not os.path.exists(path_to_write_to):
+            os.makedirs(path_to_write_to)
+        df_to_write.to_csv(f'{path_to_write_to}/result.csv')
