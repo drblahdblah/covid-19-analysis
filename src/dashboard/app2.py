@@ -173,7 +173,7 @@ def create_time_series(dff, axis_type, title):
      dash.dependencies.Input('crossfilter-xaxis-column', 'value'),
      dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
 def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
-    country_name = hover_data['points'][0]['customdata']
+    country_name = hover_data['points'][0]['text']
     dff = df[df['Country/Region'] == country_name]
     dff = dff[dff['indicator'] == xaxis_column_name]
     title = f'<b>{country_name}</b><br>{xaxis_column_name}'
@@ -187,7 +187,7 @@ def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-yaxis-type', 'value')]
 )
 def update_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = df[df['Country/Region'] == hover_data['points'][0]['customdata']]
+    dff = df[df['Country/Region'] == hover_data['points'][0]['text']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
 
