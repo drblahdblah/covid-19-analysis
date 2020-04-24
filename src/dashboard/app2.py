@@ -1,9 +1,15 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.max_rows", 1000)
+pd.set_option("display.width", 1000)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -85,12 +91,12 @@ app.layout = html.Div([
         min=df['Days'].min(),
         max=df['Days'].max(),
         value=df['Days'].max(),
-        marks={str(year): str(year) for year in df['Days'].unique()},
+        marks={str(year): str(year) for year in df['Days'].unique()[0::5]},
         step=2
     ), style={'width': '49%', 'padding': '0px 20px 20px 20px'}),
 
-    html.Div(children=f'(C) Dr. David I. Jones, 2020. MIT License. See https://github.com/drblahdblah/covid-19-analysis'
-                      f' for the code.',
+    html.Div(children=f'Copyright Dr. David I. Jones, 2020. MIT License. '
+                      f'See https://github.com/drblahdblah/covid-19-analysis for the code.',
              style={
                  'textAlign': 'right',
              })
@@ -108,7 +114,6 @@ def update_graph(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
                  date_value):
     dff = df[df['Days'] == date_value]
-
     return {
         'data': [dict(
             x=dff[dff['indicator'] == xaxis_column_name]['value'],
@@ -177,7 +182,8 @@ def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
     dash.dependencies.Output('y-time-series', 'figure'),
     [dash.dependencies.Input('crossfilter-indicator-scatter', 'hoverData'),
      dash.dependencies.Input('crossfilter-yaxis-column', 'value'),
-     dash.dependencies.Input('crossfilter-yaxis-type', 'value')])
+     dash.dependencies.Input('crossfilter-yaxis-type', 'value')]
+)
 def update_x_timeseries(hover_data, yaxis_column_name, axis_type):
     dff = df[df['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]

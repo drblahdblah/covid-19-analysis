@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 import pandas as pd
-
+from pycountry_convert import country_alpha2_to_continent_code, country_name_to_country_alpha2
 from src.corona_analysis.corona_transformations import CoronaTransformations
 
 pd.set_option("display.max_columns", 500)
@@ -124,17 +124,66 @@ class CoronaAnalysis:
         CoronaAnalysis.write_to_csv(df_to_write=df_dbl_time, path_to_write_to=result_df_path)
         print(f"Wrote out DF to {result_df_path}.")
 
+        # Add continent to the data
+        df_dbl_time = CoronaAnalysis.assign_continent_to_df(df_dbl_time)
+
         # Stack the DF to get data into format for the dashboard
-        stacked = df_dbl_time.set_index(['Date', 'Country/Region']).stack(dropna=False).reset_index()
-        stacked = stacked.rename(columns={"level_2": "indicator", 0: "value"})
+        stacked = CoronaAnalysis.stack_data_for_dashboard(df_dbl_time)
+        stacked_df_path = f'../data/output/complete_df/stacked/{date_today}'
+        CoronaAnalysis.write_to_csv(df_to_write=stacked, path_to_write_to=stacked_df_path)
+        print(f"Wrote out stacked DF to {stacked_df_path}.")
+
+    @staticmethod
+    def stack_data_for_dashboard(df_dbl_time):
+        """
+        Method to arrange data in a dataframe in a way that allows for representation in the dashboard
+        :param df_dbl_time:
+        :return:
+        """
+        stacked = df_dbl_time.set_index(['Date', 'Country/Region', 'Continent']).stack(dropna=False).reset_index()
+        stacked = stacked.rename(columns={"level_3": "indicator", 0: "value"})
         stacked['Days'] = (stacked
                            .groupby(['Country/Region'])['Date']
                            .transform(lambda x: (x - x.min()).dt.days)
                            )
-        print(stacked.loc[stacked['Country/Region'] == 'Australia'].head(500))
-        stacked_df_path = f'../data/output/complete_df/stacked/{date_today}'
-        CoronaAnalysis.write_to_csv(df_to_write=stacked, path_to_write_to=stacked_df_path)
-        print(f"Wrote out stacked DF to {stacked_df_path}.")
+        return stacked
+
+    @staticmethod
+    def assign_continent_to_df(df_dbl_time: pd.DataFrame) -> pd.DataFrame:
+        """
+        Method to assign a continent to a country in the given dataframe. Some
+        alterations have had to be made due to the absence of them in the ISO codes.
+        This in NO way is a political statement from the author.
+        :param df_dbl_time:
+        :return:
+        """
+        continents = {
+            'NA': 'North America',
+            'SA': 'South America',
+            'AS': 'Asia',
+            'OC': 'Australia',
+            'AF': 'Africa',
+            'EU': 'Europe'
+        }
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'US', 'Country/Region'] = 'USA'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Burma', 'Country/Region'] = 'Myanmar'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Congo (Brazzaville)', 'Country/Region'] = 'Congo'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Congo (Kinshasa)', 'Country/Region'] = 'Congo'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Cote d\'Ivoire', 'Country/Region'] = 'Ivory Coast'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Diamond Princess', 'Country/Region'] = 'Japan'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Holy See', 'Country/Region'] = 'Italy'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Korea, South', 'Country/Region'] = 'South Korea'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Kosovo', 'Country/Region'] = 'Serbia'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'MS Zaandam', 'Country/Region'] = 'Netherlands'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Taiwan*', 'Country/Region'] = 'Taiwan'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Timor-Leste', 'Country/Region'] = 'Indonesia'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'West Bank and Gaza', 'Country/Region'] = 'Israel'
+        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Western Sahara', 'Country/Region'] = 'Mali'
+        df_dbl_time['Continent'] = (df_dbl_time.apply(
+            lambda x: continents[country_alpha2_to_continent_code(country_name_to_country_alpha2(x['Country/Region']))],
+            axis=1)
+        )
+        return df_dbl_time
 
     @staticmethod
     def write_to_csv(df_to_write: pd.DataFrame, path_to_write_to: str):
