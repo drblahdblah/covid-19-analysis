@@ -3,31 +3,49 @@ from datetime import datetime
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
-from create_corona_dfs import CoronaAnalysis
+import pandas as pd
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
-ca = CoronaAnalysis(case_type='case', data_type='world')
+stacked_df_path = f'../../data/output/complete_df/stacked/{date_today}/result.csv'
+df = pd.read_csv(stacked_df_path, header=0)
+available_indicators = df['indicator'].unique()
 
-blerg, complete_data = ca.run_corona_analysis()
-print(complete_data.Date.dt.date.max())
-available_indicators = complete_data['indicator'].unique()
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
 
 app.layout = html.Div([
+
+    html.H1(
+        children='Corona-virus Dashboard',
+        style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }
+    ),
+
+    html.Div(children=f'A dashboard for visualising my analyses of the Johns Hopkins Univerisity\'s (JHUs)'
+                      f'corona-virus dataset.',
+             style={
+                 'textAlign': 'center',
+                 'color': colors['text']
+             }),
+
     html.Div([
 
         html.Div([
             dcc.Dropdown(
                 id='crossfilter-xaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                value='Log[Total cases (Total Cases / Country)]'
+                value='Total Cases (cumulative cases / country)'
             ),
             dcc.RadioItems(
                 id='crossfilter-xaxis-type',
+                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
                 value='Linear',
                 labelStyle={'display': 'inline-block'}
             )
@@ -38,10 +56,11 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='crossfilter-yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicators],
-                value='Log[Total cases (Total Cases / Country)]'
+                value='New cases / day / country'
             ),
             dcc.RadioItems(
                 id='crossfilter-yaxis-type',
+                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
                 value='Linear',
                 labelStyle={'display': 'inline-block'}
             )
@@ -65,12 +84,18 @@ app.layout = html.Div([
 
     html.Div(dcc.Slider(
         id='crossfilter-year--slider',
-        min=complete_data['Date'].dt.date.min(),
-        max=complete_data['Date'].dt.date.max(),
-        value=complete_data['Date'].dt.date.max(),
-        marks={str(date): str(date) for date in complete_data['Date'].unique()},
-        step=None
-    ), style={'width': '49%', 'padding': '0px 20px 20px 20px'})
+        min=df['Days'].min(),
+        max=df['Days'].max(),
+        value=df['Days'].max(),
+        marks={str(year): str(year) for year in df['Days'].unique()},
+        step=2
+    ), style={'width': '49%', 'padding': '0px 20px 20px 20px'}),
+
+    html.Div(children=f'(C) Dr. David I. Jones, 2020. MIT License. See https://github.com/drblahdblah/covid-19-analysis'
+                      f' xfor the code.',
+             style={
+                 'textAlign': 'right',
+             })
 ])
 
 
@@ -84,7 +109,7 @@ app.layout = html.Div([
 def update_graph(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
                  date_value):
-    dff = complete_data[complete_data['Date'] == date_value]
+    dff = df[df['Days'] == date_value]
 
     return {
         'data': [dict(
@@ -144,7 +169,7 @@ def create_time_series(dff, axis_type, title):
      dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
 def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
     country_name = hover_data['points'][0]['customdata']
-    dff = complete_data[complete_data['Country/Region'] == country_name]
+    dff = df[df['Country/Region'] == country_name]
     dff = dff[dff['indicator'] == xaxis_column_name]
     title = f'<b>{country_name}</b><br>{xaxis_column_name}'
     return create_time_series(dff, axis_type, title)
@@ -156,7 +181,7 @@ def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-yaxis-column', 'value'),
      dash.dependencies.Input('crossfilter-yaxis-type', 'value')])
 def update_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = complete_data[complete_data['Country/Region'] == hover_data['points'][0]['customdata']]
+    dff = df[df['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
 
