@@ -24,15 +24,13 @@ app.layout = html.Div([
         children='Corona-virus Dashboard',
         style={
             'textAlign': 'center',
-            'color': colors['text']
         }
     ),
 
     html.Div(children=f'A dashboard for visualising my analyses of the Johns Hopkins Univerisity\'s (JHUs)'
-                      f'corona-virus dataset.',
+                      f' corona-virus dataset.',
              style={
                  'textAlign': 'center',
-                 'color': colors['text']
              }),
 
     html.Div([
@@ -92,7 +90,7 @@ app.layout = html.Div([
     ), style={'width': '49%', 'padding': '0px 20px 20px 20px'}),
 
     html.Div(children=f'(C) Dr. David I. Jones, 2020. MIT License. See https://github.com/drblahdblah/covid-19-analysis'
-                      f' xfor the code.',
+                      f' for the code.',
              style={
                  'textAlign': 'right',
              })

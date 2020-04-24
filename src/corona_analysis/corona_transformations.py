@@ -149,12 +149,15 @@ class CoronaTransformations:
                                                     )
         df_to_transform['Average Growth Rate'] = (df_to_transform
                                                   .groupby(groupby_list)['growth_rate']
-                                                  .transform(lambda x: np.where(
-            np.log(2) / np.log(1) + x.rolling(period).mean() < 1,
-            0,
-            np.log(2) / np.log(1) + x.rolling(period).mean())
+                                                  .transform(lambda x: np.log(2) /
+                                                                       (np.log(1) +
+                                                                        np.where(x.rolling(period).mean() < 1,
+                                                                                 1,
+                                                                                 x.rolling(period).mean())
+                                                                        )
                                                              )
                                                   )
+
         df_to_transform['Doubling time'] = (df_to_transform['Average Growth Rate'] *
                                             df_to_transform['Days since first case'])
 
