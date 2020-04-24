@@ -116,17 +116,19 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     dff = df[df['Days'] == date_value]
     return {
         'data': [dict(
-            x=dff[dff['indicator'] == xaxis_column_name]['value'],
-            y=dff[dff['indicator'] == yaxis_column_name]['value'],
-            text=dff[dff['indicator'] == yaxis_column_name]['Country/Region'],
+            x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Continent'] == i)]['value'],
+            y=dff[(dff['Continent'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)]['Country/Region'],
             customdata=dff[dff['indicator'] == yaxis_column_name]['Country/Region'],
             mode='markers',
             marker={
                 'size': 15,
                 'opacity': 0.5,
                 'line': {'width': 0.5, 'color': 'white'}
-            }
-        )],
+            },
+            name=i
+        ) for i in dff['Continent'].unique()
+        ],
         'layout': dict(
             xaxis={
                 'title': xaxis_column_name,
