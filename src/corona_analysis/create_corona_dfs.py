@@ -11,6 +11,10 @@ import pandas as pd
 
 from src.corona_analysis.corona_transformations import CoronaTransformations
 
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.max_rows", 1000)
+pd.set_option("display.width", 1000)
+
 
 class CoronaAnalysis:
     """
@@ -68,7 +72,7 @@ class CoronaAnalysis:
         return world_data
 
     @staticmethod
-    def run_corona_analysis() -> tuple:
+    def run_corona_analysis():
 
         date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 
@@ -118,10 +122,19 @@ class CoronaAnalysis:
                                                   groupby_list=groupby_list)
         result_df_path = f'../data/output/complete_df/{date_today}'
         CoronaAnalysis.write_to_csv(df_to_write=df_dbl_time, path_to_write_to=result_df_path)
+        print(f"Wrote out DF to {result_df_path}.")
 
-        stacked = df_dbl_time.set_index(['Date', 'Country/Region']).stack().reset_index()
+        # Stack the DF to get data into format for the dashboard
+        stacked = df_dbl_time.set_index(['Date', 'Country/Region']).stack(dropna=False).reset_index()
         stacked = stacked.rename(columns={"level_2": "indicator", 0: "value"})
-        return melted_data, stacked
+        stacked['Days'] = (stacked
+                           .groupby(['Country/Region'])['Date']
+                           .transform(lambda x: (x - x.min()).dt.days)
+                           )
+        print(stacked.loc[stacked['Country/Region'] == 'Australia'].head(500))
+        stacked_df_path = f'../data/output/complete_df/stacked/{date_today}'
+        CoronaAnalysis.write_to_csv(df_to_write=stacked, path_to_write_to=stacked_df_path)
+        print(f"Wrote out stacked DF to {stacked_df_path}.")
 
     @staticmethod
     def write_to_csv(df_to_write: pd.DataFrame, path_to_write_to: str):
