@@ -9,5 +9,5 @@ pd.set_option("display.max_rows", 1000)
 pd.set_option("display.width", 1000)
 
 if __name__ == '__main__':
-
-    CoronaAnalysis.run_corona_analysis()
+    ca = CoronaAnalysis(case_type='case', data_type='world')
+    ca.run_corona_analysis()

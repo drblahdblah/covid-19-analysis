@@ -71,8 +71,7 @@ class CoronaAnalysis:
         world_data.Date = pd.to_datetime(world_data.Date)
         return world_data
 
-    @staticmethod
-    def run_corona_analysis():
+    def run_corona_analysis(self):
 
         date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 
@@ -125,38 +124,88 @@ class CoronaAnalysis:
         print(f"Wrote out DF to {result_df_path}.")
 
         # Add continent to the data
-        df_dbl_time = CoronaAnalysis.assign_continent_to_df(df_dbl_time)
+        df_dbl_time_with_cont = self.assign_continent_to_df(df_add_continent=df_dbl_time)
 
         # Stack the DF to get data into format for the dashboard
-        stacked = CoronaAnalysis.stack_data_for_dashboard(df_dbl_time)
+        stacked = CoronaAnalysis.stack_data_for_dashboard(df_dbl_time_with_cont)
         stacked_df_path = f'../data/output/complete_df/stacked/{date_today}'
         CoronaAnalysis.write_to_csv(df_to_write=stacked, path_to_write_to=stacked_df_path)
         print(f"Wrote out stacked DF to {stacked_df_path}.")
 
+        # pivot data for dashboard
+        df_total_new_cases = stacked.loc[(stacked.indicator == 'total_cases') |
+                                         (stacked.indicator == 'new_cases') |
+                                         (stacked.indicator == 'growth_rate')]
+
+        # df_total_new_cases = df_total_new_cases.drop(labels=['Unnamed: 0'], axis=1)
+
+        pivoted_data_path = f'../data/output/complete_df/pivoted/{date_today}'
+        pivoted = (df_total_new_cases
+                   .set_index(['Date', 'Country/Region', 'Continent', 'Days'])
+                   .pivot_table(values='value',
+                                index=['Date', 'Country/Region', 'Continent', 'Days'],
+                                columns='indicator',
+                                aggfunc='mean',
+                                fill_value=0)
+                   .reset_index()
+                   )
+        CoronaAnalysis.write_to_csv(df_to_write=pivoted, path_to_write_to=pivoted_data_path)
+        print(f"Wrote pivoted data frame to {pivoted_data_path}")
+
     @staticmethod
-    def stack_data_for_dashboard(df_dbl_time):
+    def stack_data_for_dashboard(df_to_stack):
         """
         Method to arrange data in a dataframe in a way that allows for representation in the dashboard
-        :param df_dbl_time:
+        :param df_to_stack:
         :return:
         """
-        stacked = df_dbl_time.set_index(['Date', 'Country/Region', 'Continent']).stack(dropna=False).reset_index()
+
+        stacked = (df_to_stack
+                   .set_index(['Date', 'Country/Region', 'Continent'])
+                   .stack()
+                   .reset_index()
+                   )
         stacked = stacked.rename(columns={"level_3": "indicator", 0: "value"})
+
         stacked['Days'] = (stacked
-                           .groupby(['Country/Region'])['Date']
+                           .groupby(['Country/Region', 'Continent'])['Date']
                            .transform(lambda x: (x - x.min()).dt.days)
                            )
         return stacked
 
-    @staticmethod
-    def assign_continent_to_df(df_dbl_time: pd.DataFrame) -> pd.DataFrame:
+    def assign_continent_to_df(self, df_add_continent: pd.DataFrame) -> pd.DataFrame:
         """
         Method to assign a continent to a country in the given dataframe. Some
         alterations have had to be made due to the absence of them in the ISO codes.
         This in NO way is a political statement from the author.
-        :param df_dbl_time:
+        :param df_add_continent:
         :return:
         """
+
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'US', 'Country/Region'] = 'USA'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Burma', 'Country/Region'] = 'Myanmar'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Congo (Brazzaville)', 'Country/Region'] = 'Congo'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Congo (Kinshasa)', 'Country/Region'] = 'Congo'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Cote d\'Ivoire', 'Country/Region'] = 'Ivory Coast'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Diamond Princess', 'Country/Region'] = 'Japan'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Holy See', 'Country/Region'] = 'Italy'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Korea, South', 'Country/Region'] = 'South Korea'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Kosovo', 'Country/Region'] = 'Serbia'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'MS Zaandam', 'Country/Region'] = 'Netherlands'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Taiwan*', 'Country/Region'] = 'Taiwan'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Timor-Leste', 'Country/Region'] = 'Indonesia'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'West Bank and Gaza', 'Country/Region'] = 'Israel'
+        df_add_continent.loc[df_add_continent['Country/Region'] == 'Western Sahara', 'Country/Region'] = 'Mali'
+
+        df_add_continent['Continent'] = (df_add_continent
+                                         .apply(lambda x: self.apply_continent_to_country(x['Country/Region']),
+                                                axis=1
+                                                )
+                                         )
+        return df_add_continent
+
+    @staticmethod
+    def apply_continent_to_country(country):
         continents = {
             'NA': 'North America',
             'SA': 'South America',
@@ -165,25 +214,7 @@ class CoronaAnalysis:
             'AF': 'Africa',
             'EU': 'Europe'
         }
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'US', 'Country/Region'] = 'USA'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Burma', 'Country/Region'] = 'Myanmar'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Congo (Brazzaville)', 'Country/Region'] = 'Congo'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Congo (Kinshasa)', 'Country/Region'] = 'Congo'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Cote d\'Ivoire', 'Country/Region'] = 'Ivory Coast'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Diamond Princess', 'Country/Region'] = 'Japan'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Holy See', 'Country/Region'] = 'Italy'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Korea, South', 'Country/Region'] = 'South Korea'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Kosovo', 'Country/Region'] = 'Serbia'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'MS Zaandam', 'Country/Region'] = 'Netherlands'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Taiwan*', 'Country/Region'] = 'Taiwan'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Timor-Leste', 'Country/Region'] = 'Indonesia'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'West Bank and Gaza', 'Country/Region'] = 'Israel'
-        df_dbl_time.loc[df_dbl_time['Country/Region'] == 'Western Sahara', 'Country/Region'] = 'Mali'
-        df_dbl_time['Continent'] = (df_dbl_time.apply(
-            lambda x: continents[country_alpha2_to_continent_code(country_name_to_country_alpha2(x['Country/Region']))],
-            axis=1)
-        )
-        return df_dbl_time
+        return continents[country_alpha2_to_continent_code(country_name_to_country_alpha2(country))]
 
     @staticmethod
     def write_to_csv(df_to_write: pd.DataFrame, path_to_write_to: str):
