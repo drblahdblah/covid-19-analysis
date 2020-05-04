@@ -23,15 +23,15 @@ date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 # path_of_main_analysis = f"/data/output/complete_df/stacked/{date_today}/"
 # if not os.path.exists(path_of_main_analysis):
 #     CoronaAnalysis.run_corona_analysis()
-stacked_df_path = f'./data/output/complete_df/stacked/{date_today}/result.csv'
-df = pd.read_csv(stacked_df_path, header=0)
-available_indicators = df['indicator'].unique()
+stacked_df_path = f'./data/output/cases/complete_df/stacked/{date_today}/result.csv'
+df_cases = pd.read_csv(stacked_df_path, header=0)
+available_indicators = df_cases['indicator'].unique()
 
-days = df.Days.unique()
-continents = df.Continent.unique()
+days = df_cases.Days.unique()
+continents = df_cases.Continent.unique()
 
-df_total_new_cases = df.loc[(df.indicator == 'total_cases') |
-                            (df.indicator == 'new_cases')]
+df_total_new_cases = df_cases.loc[(df_cases.indicator == 'Total cases') |
+                                  (df_cases.indicator == 'New cases')]
 df_total_new_cases = df_total_new_cases.drop(labels=['Unnamed: 0'], axis=1)
 
 pivoted = (df_total_new_cases
@@ -143,14 +143,14 @@ def create_animation_scatter_plot() -> go.Figure:
             dataset_by_day["Continent"] == Continent]
 
         data_dict = {
-            "x": list(dataset_by_year_and_cont["total_cases"]),
-            "y": list(dataset_by_year_and_cont["new_cases"]),
+            "x": list(dataset_by_year_and_cont["Total cases"]),
+            "y": list(dataset_by_year_and_cont["New cases"]),
             "mode": "markers",
             "text": list(dataset_by_year_and_cont["Country/Region"]),
             "marker": {
                 "sizemode": "area",
                 "sizeref": 100,
-                "size": list(dataset_by_year_and_cont["total_cases"])
+                "size": list(dataset_by_year_and_cont["Total cases"])
             },
             "name": Continent
         }
@@ -165,14 +165,14 @@ def create_animation_scatter_plot() -> go.Figure:
                 dataset_by_year["Continent"] == continent]
 
             data_dict = {
-                "x": list(dataset_by_year_and_cont["total_cases"]),
-                "y": list(dataset_by_year_and_cont["new_cases"]),
+                "x": list(dataset_by_year_and_cont["Total cases"]),
+                "y": list(dataset_by_year_and_cont["New cases"]),
                 "mode": "markers",
                 "text": list(dataset_by_year_and_cont["Country/Region"]),
                 "marker": {
                     "sizemode": "area",
                     "sizeref": 50,
-                    "size": list(dataset_by_year_and_cont["total_cases"])
+                    "size": list(dataset_by_year_and_cont["Total cases"])
                 },
                 "name": continent
             }
@@ -258,7 +258,7 @@ app.layout = html.Div([
             # Main plot
             dcc.Graph(
                 id='crossfilter-indicator-scatter',
-                hoverData={'points': [{'customdata': 'Spain'}]},
+                hoverData={'points': [{'customdata': 'Netherlands'}]},
             )
         ], style={'width': '49%',
                   'float': 'left',
@@ -281,10 +281,10 @@ app.layout = html.Div([
         # Slider for time movement
         html.Div(dcc.Slider(
             id='crossfilter-year--slider',
-            min=df['Days'].min(),
-            max=df['Days'].max(),
-            value=df['Days'].max(),
-            marks={str(year): str(year) for year in df['Days'].unique()[0::5]},
+            min=df_cases['Days'].min(),
+            max=df_cases['Days'].max(),
+            value=df_cases['Days'].max(),
+            marks={str(year): str(year) for year in df_cases['Days'].unique()[0::5]},
             step=2
         ), style={'width': '49%',
                   'float': 'left',
@@ -329,7 +329,7 @@ app.layout = html.Div([
 def update_graph(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
                  date_value):
-    dff = df[df['Days'] == date_value]
+    dff = df_cases[df_cases['Days'] == date_value]
     return {
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Continent'] == i)]['value'],
@@ -390,7 +390,7 @@ def create_time_series(dff, axis_type, title):
      dash.dependencies.Input('crossfilter-xaxis-type', 'value')])
 def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
     country_name = hover_data['points'][0]['customdata']
-    dff = df[df['Country/Region'] == country_name]
+    dff = df_cases[df_cases['Country/Region'] == country_name]
     dff = dff[dff['indicator'] == xaxis_column_name]
     title = f'<b>{country_name}</b><br>{xaxis_column_name}'
     return create_time_series(dff, axis_type, title)
@@ -403,7 +403,7 @@ def update_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-yaxis-type', 'value')]
 )
 def update_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = df[df['Country/Region'] == hover_data['points'][0]['customdata']]
+    dff = df_cases[df_cases['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
 

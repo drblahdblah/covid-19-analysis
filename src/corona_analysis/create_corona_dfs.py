@@ -9,6 +9,7 @@ from datetime import datetime
 
 import pandas as pd
 from pycountry_convert import country_alpha2_to_continent_code, country_name_to_country_alpha2
+
 from src.corona_analysis.corona_transformations import CoronaTransformations
 
 pd.set_option("display.max_columns", 500)
@@ -31,15 +32,6 @@ class CoronaAnalysis:
         or the USA-specific data.
         :return: A Pandas DataFrame containing the raw data.
         """
-        # if self.data_type != 'world' or self.data_type != 'usa':
-        #     print(f"Please check which data_type you want to load:\n"
-        #           f"Possible values: 'world' or 'usa'")
-        #     exit(1)
-        #
-        # if self.case_type != 'death' or self.case_type != 'case':
-        #     print(f"Please check which case_type you want to load:\n"
-        #           f"Possible values: 'case' or 'death'")
-        #     exit(1)
 
         if self.data_type == 'world' and self.case_type == 'case':
             raw_data = pd.read_csv(f'~/PyCharmProjects/covid-19-analysis/data/COVID-19/csse_covid_19_data/'
@@ -72,74 +64,99 @@ class CoronaAnalysis:
         return world_data
 
     def run_corona_analysis(self):
+        """
 
+        :return:
+        """
         date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
+        print(f"Running analysis for {self.case_type} and {self.data_type} for date {date_today}")
 
-        corona_analysis = CoronaAnalysis(case_type='case', data_type='world')
-        raw_data = corona_analysis.load_raw_data()
-        melted_data = corona_analysis.melt_df(raw_data=raw_data)
-        melted_data_dir = f'../data/output/data_at_state_level/{date_today}'
-        CoronaAnalysis.write_to_csv(df_to_write=melted_data, path_to_write_to=melted_data_dir)
+        raw_data = self.load_raw_data()
+        countries_to_drop = ['Holy See', 'Congo (Brazzaville)', 'Congo (Kinshasa)', 'Diamond Princess',
+                             'MS Zaandam', 'Kosovo', 'Timor-Leste', 'West Bank and Gaza', 'Western Sahara']
+        raw_data = raw_data.loc[~raw_data['Country/Region'].isin(countries_to_drop)]
+
+        melted_data = self.melt_df(raw_data=raw_data)
+        melted_data_dir = f'data_at_state_level/{date_today}'
+        self.write_to_csv(df_to_write=melted_data,
+                          path_to_write_to=melted_data_dir,
+                          file_name='result.csv')
 
         cts = CoronaTransformations()
 
-        total_cases_df = cts.create_cases_per_day(df_to_transform=melted_data, groupby_list=['Date', 'Country/Region'])
+        print(f"Creating total number of {self.case_type}s")
+        total_cases_df = cts.create_cases_per_day(df_to_transform=melted_data,
+                                                  groupby_list=['Date', 'Country/Region'])
+        print("done.")
 
+        print(f"Creating number of {self.case_type}s per period")
         period = 1
         groupby_list = ['Country/Region']
         cases_per_period = cts.create_cases_per_period(df_to_transform=total_cases_df,
                                                        groupby_list=groupby_list,
-                                                       case_column='total_cases')
+                                                       case_column='Total cases')
+        print("done.")
 
+        print(f"Creating rolling average of {self.case_type}s per period")
         rolling_avg = cts.create_rolling_average(df_to_transform=cases_per_period,
                                                  groupby_list=groupby_list,
                                                  period=7)
 
+        print(f"Creating power-law data products for {self.case_type}s")
         power_law = cts.calculate_power_law_columns(df_to_transform=rolling_avg,
-                                                    cols_to_logify=['total_cases', 'new_cases_per_week'])
+                                                    cols_to_logify=['Total cases', 'New cases per week'])
 
         pl_slope = cts.calculate_power_law_slope(df_to_transform=power_law,
                                                  period=10,
                                                  groupby_list=groupby_list,
-                                                 rise='log_new_cases_per_week',
-                                                 run='log_total_cases')
+                                                 rise='log10(New cases per week)',
+                                                 run='log10(Total cases)')
 
         pl_acceleration = cts.calculate_power_law_acceleration(df_to_transform=pl_slope,
                                                                period=period,
                                                                groupby_list=groupby_list,
-                                                               rise='slope_log_new_cases_per_week',
-                                                               run='log_total_cases')
-
+                                                               rise='slope of log10(New cases per week)',
+                                                               run='log10(Total cases)')
+        pl_acceleration = (pl_acceleration
+                           .rename(columns={"slope of slope of log10(New cases per week)": "Acceleration of power-law",
+                                            "slope of log10(New cases per week)": "Slope of power-law"})
+                           )
+        print("done.")
+        print(f"Creating growth rates and doubling times for {self.case_type}s.")
         df_gr = cts.calculate_growth_rate(df_to_transform=pl_acceleration,
                                           period=5,
                                           groupby_list=groupby_list,
-                                          new_cases='new_cases',
-                                          total_cases='total_cases')
+                                          new_cases='New cases',
+                                          total_cases='Total cases')
 
         df_dbl_time = cts.calculate_doubling_time(df_to_transform=df_gr,
                                                   period=5,
                                                   groupby_list=groupby_list)
-        result_df_path = f'../data/output/complete_df/{date_today}'
-        CoronaAnalysis.write_to_csv(df_to_write=df_dbl_time, path_to_write_to=result_df_path)
-        print(f"Wrote out DF to {result_df_path}.")
+        print("done.")
+        result_df_path = f'complete_df/{date_today}'
+        self.write_to_csv(df_to_write=df_dbl_time,
+                          path_to_write_to=result_df_path,
+                          file_name='result.csv')
 
         # Add continent to the data
+        print(f"Adding continents to the {self.case_type}s data")
         df_dbl_time_with_cont = self.assign_continent_to_df(df_add_continent=df_dbl_time)
+        print("done.")
 
         # Stack the DF to get data into format for the dashboard
+        print(f"Preparing data for {self.case_type}s for dashboard")
         stacked = CoronaAnalysis.stack_data_for_dashboard(df_dbl_time_with_cont)
-        stacked_df_path = f'../data/output/complete_df/stacked/{date_today}'
-        CoronaAnalysis.write_to_csv(df_to_write=stacked, path_to_write_to=stacked_df_path)
-        print(f"Wrote out stacked DF to {stacked_df_path}.")
+        stacked_df_path = f'complete_df/stacked/{date_today}'
+        self.write_to_csv(df_to_write=stacked,
+                          path_to_write_to=stacked_df_path,
+                          file_name='result.csv')
 
         # pivot data for dashboard
-        df_total_new_cases = stacked.loc[(stacked.indicator == 'total_cases') |
-                                         (stacked.indicator == 'new_cases') |
-                                         (stacked.indicator == 'growth_rate')]
+        df_total_new_cases = stacked.loc[(stacked.indicator == 'Total cases') |
+                                         (stacked.indicator == 'New cases') |
+                                         (stacked.indicator == 'Growth Rate')]
 
-        # df_total_new_cases = df_total_new_cases.drop(labels=['Unnamed: 0'], axis=1)
-
-        pivoted_data_path = f'../data/output/complete_df/pivoted/{date_today}'
+        pivoted_data_path = f'complete_df/pivoted/{date_today}'
         pivoted = (df_total_new_cases
                    .set_index(['Date', 'Country/Region', 'Continent', 'Days'])
                    .pivot_table(values='value',
@@ -149,8 +166,10 @@ class CoronaAnalysis:
                                 fill_value=0)
                    .reset_index()
                    )
-        CoronaAnalysis.write_to_csv(df_to_write=pivoted, path_to_write_to=pivoted_data_path)
-        print(f"Wrote pivoted data frame to {pivoted_data_path}")
+        print("done.")
+        self.write_to_csv(df_to_write=pivoted,
+                          path_to_write_to=pivoted_data_path,
+                          file_name='result_pivoted.csv')
 
     @staticmethod
     def stack_data_for_dashboard(df_to_stack):
@@ -159,7 +178,8 @@ class CoronaAnalysis:
         :param df_to_stack:
         :return:
         """
-
+        # Need to fillna to 0s
+        df_to_stack = df_to_stack.fillna(0)
         stacked = (df_to_stack
                    .set_index(['Date', 'Country/Region', 'Continent'])
                    .stack()
@@ -184,18 +204,9 @@ class CoronaAnalysis:
 
         df_add_continent.loc[df_add_continent['Country/Region'] == 'US', 'Country/Region'] = 'USA'
         df_add_continent.loc[df_add_continent['Country/Region'] == 'Burma', 'Country/Region'] = 'Myanmar'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Congo (Brazzaville)', 'Country/Region'] = 'Congo'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Congo (Kinshasa)', 'Country/Region'] = 'Congo'
         df_add_continent.loc[df_add_continent['Country/Region'] == 'Cote d\'Ivoire', 'Country/Region'] = 'Ivory Coast'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Diamond Princess', 'Country/Region'] = 'Japan'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Holy See', 'Country/Region'] = 'Italy'
         df_add_continent.loc[df_add_continent['Country/Region'] == 'Korea, South', 'Country/Region'] = 'South Korea'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Kosovo', 'Country/Region'] = 'Serbia'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'MS Zaandam', 'Country/Region'] = 'Netherlands'
         df_add_continent.loc[df_add_continent['Country/Region'] == 'Taiwan*', 'Country/Region'] = 'Taiwan'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Timor-Leste', 'Country/Region'] = 'Indonesia'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'West Bank and Gaza', 'Country/Region'] = 'Israel'
-        df_add_continent.loc[df_add_continent['Country/Region'] == 'Western Sahara', 'Country/Region'] = 'Mali'
 
         df_add_continent['Continent'] = (df_add_continent
                                          .apply(lambda x: self.apply_continent_to_country(x['Country/Region']),
@@ -210,14 +221,34 @@ class CoronaAnalysis:
             'NA': 'North America',
             'SA': 'South America',
             'AS': 'Asia',
-            'OC': 'Australia',
+            'OC': 'Australasia',
             'AF': 'Africa',
             'EU': 'Europe'
         }
         return continents[country_alpha2_to_continent_code(country_name_to_country_alpha2(country))]
 
-    @staticmethod
-    def write_to_csv(df_to_write: pd.DataFrame, path_to_write_to: str):
-        if not os.path.exists(path_to_write_to):
-            os.makedirs(path_to_write_to)
-        df_to_write.to_csv(f'{path_to_write_to}/result.csv')
+    def write_to_csv(self, df_to_write: pd.DataFrame, path_to_write_to: str, file_name: str):
+
+        if self.case_type == 'case':
+            write_path_cases = f"../data/output/cases/{path_to_write_to}"
+            if os.path.exists(write_path_cases):
+                print(f'Writing data out to path: {write_path_cases}')
+                df_to_write.to_csv(write_path_cases+f'/{file_name}')
+            else:
+                print(f"Making directory to write out to...")
+                os.makedirs(write_path_cases)
+                print(f'Writing data out to path: {write_path_cases}')
+                df_to_write.to_csv(write_path_cases+f'/{file_name}')
+
+        if self.case_type == 'death':
+            write_path_deaths = f"../data/output/deaths/{path_to_write_to}"
+            if os.path.exists(write_path_deaths):
+                print(f'Writing data out to path: {write_path_deaths}')
+                df_to_write.to_csv(write_path_deaths+f'/{file_name}')
+            else:
+                print(f"Making directory to write out to...")
+                os.makedirs(write_path_deaths)
+                print(f'Writing data out to path: {write_path_deaths}')
+                df_to_write.to_csv(write_path_deaths+f'/{file_name}')
+
+        print("done.")

@@ -3,3 +3,4 @@ plotly==4.6.0
 dash==1.11.0
 numpy==1.18.3
 pycountry-convert==0.7.2
+countryinfo==0.1.0
