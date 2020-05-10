@@ -2,9 +2,12 @@
 Class describing the transformations that are made to the Corona-virus data
 that allows the Dash dashboard(s) to be made.
 """
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+import requests
 import world_bank_data as wbd
+from us import states
 
 pd.set_option("display.max_columns", 500)
 pd.set_option("display.max_rows", 1000)
@@ -12,6 +15,10 @@ pd.set_option("display.width", 1000)
 
 
 class CoronaTransformations:
+
+    def __init__(self, data_type: str, case_type: str):
+        self.data_type = data_type
+        self.case_type = case_type
 
     @staticmethod
     def get_wbd_population() -> pd.DataFrame:
@@ -26,6 +33,30 @@ class CoronaTransformations:
         pop_df['population'] = population
         pop_df.reset_index(inplace=True)
         return pop_df
+
+    @staticmethod
+    def get_us_state_population() -> pd.DataFrame:
+        """
+        Method to obtain the population of a US state using the census library
+        :return: A Pandas DataFrame containing the state name and population.
+        """
+        census_api_key = {}
+        with open("/Users/davidjones/.us_census.txt") as f:
+            for line in f:
+                (key, val) = line.split()
+                census_api_key[key] = val
+
+        pop_query_url = f'https://api.census.gov/data/2019/pep/population?get=POP&for=state:*&key=' \
+                        f'{census_api_key["api_key"]}'
+        r_json = requests.get(pop_query_url).json()
+
+        df_us_pop_by_state = pd.DataFrame(r_json[1:], columns=r_json[0])
+        us_statecd_to_name = states.mapping(from_field='fips', to_field='name')
+
+        df_us_pop_by_state["State_name"] = df_us_pop_by_state["state"].apply(lambda x: us_statecd_to_name.get(x))
+        df_us_pop_by_state = df_us_pop_by_state[['State_name', 'state', 'POP']]
+        df_us_pop_by_state.rename(columns={"state": "state_code"}, inplace=True)
+        return df_us_pop_by_state
 
     @staticmethod
     def get_ctry_pop(pop_df: pd.DataFrame, cntry: str) -> float:
@@ -80,6 +111,35 @@ class CoronaTransformations:
 
         return population / 1000000.0
 
+    @staticmethod
+    def get_usa_state_pop(us_state_pop_df: pd.DataFrame, state: str) -> float:
+        """
+        Method to get the population of a state of the USA.
+        :param us_state_pop_df: A Pandas DataFrame containing states names and populations.
+        :param state: The state whose population is requested
+        :return: The popluation of the requesite state.
+        """
+        if state == 'American Samoa':
+            population = 55465.0
+        elif state == 'Diamond Princess':
+            population = 2000.0
+        elif state == 'Grand Princess':
+            population = 2000.0
+        elif state == 'Guam':
+            population = 165768.0
+        elif state == 'Northern Mariana Islands':
+            population = 56882.0
+        elif state == 'Virgin Islands':
+            population = 106977.0
+        elif state == 'Virginia':
+            population = float(us_state_pop_df.loc[us_state_pop_df.State_name == 'Virginia'].POP.item())
+        elif state == 'West Virginia':
+            population = float(us_state_pop_df.loc[us_state_pop_df.State_name == 'West Virginia'].POP.item())
+        else:
+            population = float(us_state_pop_df.loc[us_state_pop_df.State_name.str.contains(state)].POP.item())
+
+        return population / 1000000.0
+
     def create_cases_per_day(self, df_to_transform, groupby_list) -> pd.DataFrame:
         """
         Method to create cases/day from a dataframe.
@@ -91,13 +151,25 @@ class CoronaTransformations:
                           .groupby(groupby_list, as_index=False)
                           .agg({"total_cases": "sum"})
                           )
-        pop_df = self.get_wbd_population()
 
-        total_cases_df['css_per_prsn'] = (total_cases_df
-                                          .apply(lambda x: x.total_cases / self.get_ctry_pop(pop_df=pop_df,
-                                                                                             cntry=x['Country/Region']),
-                                                 axis=1)
-                                          )
+        if self.data_type == 'world':
+            pop_df = self.get_wbd_population()
+
+            total_cases_df['css_per_prsn'] = (total_cases_df
+                                              .apply(lambda x: x.total_cases /
+                                                               self.get_ctry_pop(pop_df=pop_df,
+                                                                                 cntry=x['Country/Region']),
+                                                     axis=1)
+                                              )
+        else:
+            us_states_pop_df = self.get_us_state_population()
+
+            total_cases_df['css_per_prsn'] = (total_cases_df
+                                              .apply(lambda x: x.total_cases /
+                                                               self.get_usa_state_pop(us_state_pop_df=us_states_pop_df,
+                                                                                      state=x['Province_State']),
+                                                     axis=1)
+                                              )
         total_cases_df = total_cases_df.rename(columns={"total_cases": "Total cases",
                                                         "css_per_prsn": "Total cases per million"})
 
@@ -119,14 +191,27 @@ class CoronaTransformations:
                                         )
 
         df_to_transform['New cases'] = df_to_transform['New cases'].fillna(0)
-        pop_df = self.get_wbd_population()
 
-        df_to_transform['new_css_per_prsn'] = (df_to_transform
-                                               .apply(lambda x: x['New cases'] /
-                                                                self.get_ctry_pop(pop_df=pop_df,
-                                                                                  cntry=x['Country/Region']),
-                                                      axis=1)
-                                               )
+        if self.data_type == 'world':
+            pop_df = self.get_wbd_population()
+
+            df_to_transform['new_css_per_prsn'] = (df_to_transform
+                                                   .apply(lambda x: x['New cases'] /
+                                                                    self.get_ctry_pop(pop_df=pop_df,
+                                                                                      cntry=x['Country/Region']),
+                                                          axis=1)
+                                                   )
+
+        else:
+            us_states_pop_df = self.get_us_state_population()
+
+            df_to_transform['new_css_per_prsn'] = (df_to_transform
+                                                   .apply(lambda x: x['New cases'] /
+                                                                    self.get_usa_state_pop(
+                                                                        us_state_pop_df=us_states_pop_df,
+                                                                        state=x['Province_State']),
+                                                          axis=1)
+                                                   )
         df_to_transform = df_to_transform.rename(columns={"new_css_per_prsn": "New cases per million"})
         return df_to_transform
 
@@ -137,13 +222,24 @@ class CoronaTransformations:
                                                  )
         df_to_transform['New cases per week'] = df_to_transform['New cases per week'].fillna(0)
 
-        pop_df = self.get_wbd_population()
-        df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
-                                                  .apply(lambda x: x['New cases per week'] /
-                                                                   self.get_ctry_pop(pop_df=pop_df,
-                                                                                     cntry=x['Country/Region']),
-                                                         axis=1)
-                                                  )
+        if self.data_type == 'world':
+            pop_df = self.get_wbd_population()
+            df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
+                                                      .apply(lambda x: x['New cases per week'] /
+                                                                       self.get_ctry_pop(pop_df=pop_df,
+                                                                                         cntry=x['Country/Region']),
+                                                             axis=1)
+                                                      )
+        else:
+            us_states_pop_df = self.get_us_state_population()
+
+            df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
+                                                      .apply(lambda x: x['New cases per week'] /
+                                                                       self.get_usa_state_pop(
+                                                                           us_state_pop_df=us_states_pop_df,
+                                                                           state=x['Province_State']),
+                                                             axis=1)
+                                                      )
         df_to_transform = df_to_transform.rename(columns={"new_css_per_wk_prsn": "New cases per week per million"})
 
         return df_to_transform
@@ -212,8 +308,7 @@ class CoronaTransformations:
         return self.calculate_power_law_slope(df_to_transform=df_to_transform,
                                               period=period, groupby_list=groupby_list, rise=rise, run=run)
 
-    @staticmethod
-    def calculate_growth_rate(df_to_transform: pd.DataFrame, period: int, groupby_list: list, new_cases: str,
+    def calculate_growth_rate(self, df_to_transform: pd.DataFrame, period: int, groupby_list: list, new_cases: str,
                               total_cases: str) -> pd.DataFrame:
         """
         Method by which to calculate the growth rate of cases. This is essentially the percentage of `total_cases`
@@ -225,14 +320,25 @@ class CoronaTransformations:
         :param total_cases: The column representing the total_cases for the entire time period.
         :return: A Pandas DataFrame containing a column for the growth rate.
         """
-        df_to_transform['Growth Rate'] = ((df_to_transform
-                                           .groupby(groupby_list)[new_cases]
-                                           .transform(lambda x: x.rolling(period).mean())
-                                           ) /
-                                          df_to_transform
-                                          .groupby(['Country/Region'])[total_cases]
-                                          .transform(lambda x: x.rolling(period).mean())
-                                          ) * 100.0
+        if self.data_type == 'world':
+
+            df_to_transform['Growth Rate'] = ((df_to_transform
+                                               .groupby(groupby_list)[new_cases]
+                                               .transform(lambda x: x.rolling(period).mean())
+                                               ) /
+                                              df_to_transform
+                                              .groupby(['Country/Region'])[total_cases]
+                                              .transform(lambda x: x.rolling(period).mean())
+                                              ) * 100.0
+        else:
+            df_to_transform['Growth Rate'] = ((df_to_transform
+                                               .groupby(groupby_list)[new_cases]
+                                               .transform(lambda x: x.rolling(period).mean())
+                                               ) /
+                                              df_to_transform
+                                              .groupby(['Province_State'])[total_cases]
+                                              .transform(lambda x: x.rolling(period).mean())
+                                              ) * 100.0
         return df_to_transform
 
     @staticmethod

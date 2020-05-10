@@ -18,7 +18,7 @@ colors = {
 }
 
 date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
-ca = CoronaAnalysis(case_type='case', data_type='world')
+ca = CoronaAnalysis(data_type='world', case_type='case', processing_date='')
 df, complete_data = ca.run_corona_analysis()
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
