@@ -215,7 +215,6 @@ app.layout = html.Div(children=[
         ], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }),
     # END Dropdown menu & log/linear toggle div
@@ -248,7 +247,6 @@ app.layout = html.Div(children=[
 
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }
     ),
@@ -297,7 +295,6 @@ app.layout = html.Div(children=[
         ], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }),
     # END Dropdown menu & log/linear toggle div
@@ -329,7 +326,6 @@ app.layout = html.Div(children=[
         ),
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }
     ),
@@ -460,7 +456,6 @@ app.layout = html.Div(children=[
         ], style={'width': '49%', 'float': 'right', 'display': 'inline-block'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }),
     # END USA DEATHS Dropdown menu & log/linear toggle div
@@ -493,7 +488,6 @@ app.layout = html.Div(children=[
 
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }
     ),
@@ -513,7 +507,6 @@ app.layout = html.Div(children=[
                   style={'height': '700px'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px',
         'vertical-align': 'center'
     }),
@@ -531,7 +524,6 @@ app.layout = html.Div(children=[
                   style={'height': '700px'})
     ], style={
         'borderBottom': 'thin lightgrey solid',
-        # 'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px',
         'vertical-align': 'center'
     }),
@@ -719,17 +711,18 @@ def update_usa_cases_graph(xaxis_column_name, yaxis_column_name,
     dff = stacked_usa_cases_df[stacked_usa_cases_df['Days'] == stacked_usa_cases_df.Days.max()]
     return {
         'data': [dict(
-            x=dff[(dff['indicator'] == xaxis_column_name)]['value'],
-            y=dff[(dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name)]['Province_State'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name)]['Province_State'],
+            x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Province_State'] == i)]['value'],
+            y=dff[(dff['Province_State'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
             mode='markers',
             marker={
                 'size': 15,
                 'opacity': 0.5,
                 'line': {'width': 0.5, 'color': 'white'}
             },
-        )
+            name=i
+        ) for i in dff['Province_State'].unique()
         ],
         'layout': dict(
             xaxis={
@@ -786,17 +779,18 @@ def update_usa_deaths_graph(xaxis_column_name, yaxis_column_name,
     dff = stacked_usa_deaths_df[stacked_usa_deaths_df['Days'] == stacked_usa_deaths_df.Days.max()]
     return {
         'data': [dict(
-            x=dff[(dff['indicator'] == xaxis_column_name)]['value'],
-            y=dff[(dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name)]['Province_State'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name)]['Province_State'],
+            x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Province_State'] == i)]['value'],
+            y=dff[(dff['Province_State'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
             mode='markers',
             marker={
                 'size': 15,
                 'opacity': 0.5,
                 'line': {'width': 0.5, 'color': 'white'}
             },
-        )
+            name=i
+        ) for i in dff['Province_State'].unique()
         ],
         'layout': dict(
             xaxis={
