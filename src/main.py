@@ -13,14 +13,14 @@ pd.set_option("display.width", 1000)
 if __name__ == '__main__':
     date_today = datetime.strftime(datetime.today(), '%d-%m-%Y')
 
-    ca_us_cases = CoronaAnalysis(data_type='usa', case_type='case', processing_date=date_today)
-    ca_us_cases.run_corona_analysis()
-
-    ca_us_deaths = CoronaAnalysis(data_type='usa', case_type='death', processing_date=date_today)
-    ca_us_deaths.run_corona_analysis()
-
     ca_cases = CoronaAnalysis(data_type='world', case_type='case', processing_date=date_today)
     ca_cases.run_corona_analysis()
 
     ca_deaths = CoronaAnalysis(data_type='world', case_type='death', processing_date=date_today)
     ca_deaths.run_corona_analysis()
+
+    ca_us_cases = CoronaAnalysis(data_type='usa', case_type='case', processing_date=date_today)
+    ca_us_cases.run_corona_analysis()
+
+    ca_us_deaths = CoronaAnalysis(data_type='usa', case_type='death', processing_date=date_today)
+    ca_us_deaths.run_corona_analysis()

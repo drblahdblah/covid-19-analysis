@@ -257,7 +257,7 @@ class CoronaAnalysis:
         :return:
         """
 
-        if self.case_type == 'world':
+        if self.data_type == 'world':
             df_add_continent.loc[df_add_continent['Country/Region'] == 'US', 'Country/Region'] = 'USA'
             df_add_continent.loc[df_add_continent['Country/Region'] == 'Burma', 'Country/Region'] = 'Myanmar'
             df_add_continent.loc[
