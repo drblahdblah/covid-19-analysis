@@ -5,7 +5,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.express as px
-
+pd.set_option("display.max_columns", 500)
+pd.set_option("display.max_rows", 1000)
+pd.set_option("display.width", 1000)
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -835,4 +837,4 @@ def update_usa_deaths_x_timeseries(hover_data, yaxis_column_name, axis_type):
 
 
 if __name__ == '__main__':
-    app.run_server(port=8399)
+    app.run_server(debug=True, port=8399)

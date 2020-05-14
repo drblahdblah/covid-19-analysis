@@ -11,10 +11,6 @@ from pycountry_convert import country_alpha2_to_continent_code, country_name_to_
 
 from src.corona_analysis.corona_transformations import CoronaTransformations
 
-pd.set_option("display.max_columns", 500)
-pd.set_option("display.max_rows", 1000)
-pd.set_option("display.width", 1000)
-
 
 class CoronaAnalysis:
     """
