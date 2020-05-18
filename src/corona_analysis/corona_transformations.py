@@ -156,18 +156,18 @@ class CoronaTransformations:
             pop_df = self.get_wbd_population()
 
             total_cases_df['css_per_prsn'] = (total_cases_df
-                                              .apply(lambda x: x.total_cases /
-                                                               self.get_ctry_pop(pop_df=pop_df,
-                                                                                 cntry=x['Country/Region']),
+                                              .apply(lambda x: x.total_cases / self.get_ctry_pop(pop_df=pop_df,
+                                                                                                 cntry=x[
+                                                                                                     'Country/Region']),
                                                      axis=1)
                                               )
         else:
             us_states_pop_df = self.get_us_state_population()
 
             total_cases_df['css_per_prsn'] = (total_cases_df
-                                              .apply(lambda x: x.total_cases /
-                                                               self.get_usa_state_pop(us_state_pop_df=us_states_pop_df,
-                                                                                      state=x['Province_State']),
+                                              .apply(lambda x: x.total_cases / self
+                                                     .get_usa_state_pop(us_state_pop_df=us_states_pop_df,
+                                                                        state=x['Province_State']),
                                                      axis=1)
                                               )
         total_cases_df = total_cases_df.rename(columns={"total_cases": "Total cases",
@@ -196,9 +196,9 @@ class CoronaTransformations:
             pop_df = self.get_wbd_population()
 
             df_to_transform['new_css_per_prsn'] = (df_to_transform
-                                                   .apply(lambda x: x['New cases'] /
-                                                                    self.get_ctry_pop(pop_df=pop_df,
-                                                                                      cntry=x['Country/Region']),
+                                                   .apply(lambda x: x['New cases'] / self
+                                                          .get_ctry_pop(pop_df=pop_df,
+                                                                        cntry=x['Country/Region']),
                                                           axis=1)
                                                    )
 
@@ -206,8 +206,7 @@ class CoronaTransformations:
             us_states_pop_df = self.get_us_state_population()
 
             df_to_transform['new_css_per_prsn'] = (df_to_transform
-                                                   .apply(lambda x: x['New cases'] /
-                                                                    self.get_usa_state_pop(
+                                                   .apply(lambda x: x['New cases'] / self.get_usa_state_pop(
                                                                         us_state_pop_df=us_states_pop_df,
                                                                         state=x['Province_State']),
                                                           axis=1)
@@ -225,17 +224,16 @@ class CoronaTransformations:
         if self.data_type == 'world':
             pop_df = self.get_wbd_population()
             df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
-                                                      .apply(lambda x: x['New cases per week'] /
-                                                                       self.get_ctry_pop(pop_df=pop_df,
-                                                                                         cntry=x['Country/Region']),
+                                                      .apply(lambda x: x['New cases per week'] / self
+                                                             .get_ctry_pop(pop_df=pop_df,
+                                                                           cntry=x['Country/Region']),
                                                              axis=1)
                                                       )
         else:
             us_states_pop_df = self.get_us_state_population()
 
             df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
-                                                      .apply(lambda x: x['New cases per week'] /
-                                                                       self.get_usa_state_pop(
+                                                      .apply(lambda x: x['New cases per week'] / self.get_usa_state_pop(
                                                                            us_state_pop_df=us_states_pop_df,
                                                                            state=x['Province_State']),
                                                              axis=1)
