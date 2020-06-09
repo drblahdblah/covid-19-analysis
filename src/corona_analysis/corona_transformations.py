@@ -23,7 +23,7 @@ class CoronaTransformations:
     @staticmethod
     def get_wbd_population() -> pd.DataFrame:
         """
-        Method to obtain
+        Method to obtain country population using the World Bank API.
         :return:
         """
         countries = wbd.get_countries()
