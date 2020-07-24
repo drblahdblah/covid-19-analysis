@@ -20,3 +20,6 @@ if __name__ == '__main__':
 
     ca_us_deaths = CoronaAnalysis(data_type='usa', case_type='death', processing_date=date_today)
     ca_us_deaths.run_corona_analysis()
+
+    ca_aus_cases = CoronaAnalysis(data_type='aus', case_type='case', processing_date=date_today)
+    ca_aus_cases.run_corona_analysis()

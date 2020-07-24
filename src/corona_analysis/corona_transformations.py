@@ -140,6 +140,16 @@ class CoronaTransformations:
 
         return population / 1000000.0
 
+    @staticmethod
+    def get_aus_state_pop(aus_state_pop_df: pd.DataFrame, state: str) -> float:
+        """
+        Method to get the population of a state of the USA.
+        :param aus_state_pop_df: A Pandas DataFrame containing states names and populations.
+        :param state: The state whose population is requested
+        :return: The popluation of the requesite state.
+        """
+        return aus_state_pop_df.loc[aus_state_pop_df['Province/State'] == state].population.item() / 1000000.0
+
     def create_cases_per_day(self, df_to_transform, groupby_list) -> pd.DataFrame:
         """
         Method to create cases/day from a dataframe.
@@ -159,6 +169,22 @@ class CoronaTransformations:
                                               .apply(lambda x: x.total_cases / self.get_ctry_pop(pop_df=pop_df,
                                                                                                  cntry=x[
                                                                                                      'Country/Region']),
+                                                     axis=1)
+                                              )
+        elif self.data_type == 'aus':
+
+            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                               "Australian Capital Territory", "South Australia",
+                                               "Western Australia", "Northern Territory"],
+                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
+                            }
+
+            aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
+
+            total_cases_df['css_per_prsn'] = (total_cases_df
+                                              .apply(lambda x: x.total_cases / self
+                                                     .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
+                                                                        state=x['Province/State']),
                                                      axis=1)
                                               )
         else:
@@ -201,7 +227,22 @@ class CoronaTransformations:
                                                                         cntry=x['Country/Region']),
                                                           axis=1)
                                                    )
+        elif self.data_type == 'aus':
 
+            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                               "Australian Capital Territory", "South Australia",
+                                               "Western Australia", "Northern Territory"],
+                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
+                            }
+
+            aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
+
+            df_to_transform['css_per_prsn'] = (df_to_transform
+                                               .apply(lambda x: x['New cases'] / self
+                                                      .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
+                                                                         state=x['Province/State']),
+                                                      axis=1)
+                                               )
         else:
             us_states_pop_df = self.get_us_state_population()
 
@@ -229,6 +270,22 @@ class CoronaTransformations:
                                                                            cntry=x['Country/Region']),
                                                              axis=1)
                                                       )
+        elif self.data_type == 'aus':
+
+            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                               "Australian Capital Territory", "South Australia",
+                                               "Western Australia", "Northern Territory"],
+                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
+                            }
+
+            aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
+
+            df_to_transform['css_per_prsn'] = (df_to_transform
+                                               .apply(lambda x: x['New cases'] / self
+                                                      .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
+                                                                         state=x['Province/State']),
+                                                      axis=1)
+                                               )
         else:
             us_states_pop_df = self.get_us_state_population()
 
@@ -326,6 +383,16 @@ class CoronaTransformations:
                                                ) /
                                               df_to_transform
                                               .groupby(['Country/Region'])[total_cases]
+                                              .transform(lambda x: x.rolling(period).mean())
+                                              ) * 100.0
+        elif self.data_type == 'aus':
+
+            df_to_transform['Growth Rate'] = ((df_to_transform
+                                               .groupby(groupby_list)[new_cases]
+                                               .transform(lambda x: x.rolling(period).mean())
+                                               ) /
+                                              df_to_transform
+                                              .groupby(['Province/State'])[total_cases]
                                               .transform(lambda x: x.rolling(period).mean())
                                               ) * 100.0
         else:

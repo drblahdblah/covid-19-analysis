@@ -41,6 +41,12 @@ class CoronaAnalysis:
         elif self.data_type == 'usa' and self.case_type == 'case':
             raw_data = pd.read_csv('~/PyCharmProjects/covid-19-analysis/data/COVID-19/csse_covid_19_data/'
                                    'csse_covid_19_time_series/time_series_covid19_confirmed_US.csv')
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            raw_data = pd.read_csv(f'~/PyCharmProjects/covid-19-analysis/data/COVID-19/csse_covid_19_data/'
+                                   f'csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
+            raw_data = raw_data.loc[raw_data['Country/Region'] == 'Australia']
+
+        # Default to worldwide cases.
         else:
             raw_data = pd.read_csv(f'~/PyCharmProjects/covid-19-analysis/data/COVID-19/csse_covid_19_data/'
                                    f'csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
@@ -60,11 +66,15 @@ class CoronaAnalysis:
             raw_data_filtered = raw_data[useful_cols]
 
         elif self.data_type == 'usa' and self.case_type == 'death':
-            print("here")
             useful_cols = [col for col in raw_data.columns if col not in ['UID', 'iso2', 'iso3', 'code3',
                                                                           'FIPS', 'Admin2', 'Country_Region',
                                                                           'Long_', 'Lat', 'Combined_Key', 'Population']]
             raw_data_filtered = raw_data[useful_cols]
+
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            useful_cols = [col for col in raw_data.columns if col not in ['Lat', 'Long', 'Country/Region']]
+            raw_data_filtered = raw_data[useful_cols]
+
         return raw_data_filtered
 
     @staticmethod
@@ -86,13 +96,13 @@ class CoronaAnalysis:
 
     def run_corona_analysis(self):
         """
-
-        :return:
+        Main function to run analyses of World, USA, and Australian corona virus data from the JHU database
         """
         cts = CoronaTransformations(case_type=self.case_type, data_type=self.data_type)
         print(f"Running analysis for {self.case_type} and {self.data_type} for date {self.processing_date}")
 
         raw_data = self.load_raw_data()
+
         if self.data_type == 'world':
             groupby_list = ['Country/Region']
             groupby_list_cases_per_day = ['Date', 'Country/Region']
@@ -101,6 +111,10 @@ class CoronaAnalysis:
             groupby_list_cases_per_day = ['Date', 'Province_State']
             groupby_list = ['Province_State']
             id_vars = ["Province_State"]
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            groupby_list_cases_per_day = ['Date', 'Province/State']
+            groupby_list = ['Province/State']
+            id_vars = ["Province/State"]
         else:
             groupby_list_cases_per_day = ['Date', 'Province_State']
             groupby_list = ['Province_State']
@@ -124,6 +138,7 @@ class CoronaAnalysis:
         rolling_avg = cts.create_rolling_average(df_to_transform=cases_per_period,
                                                  groupby_list=groupby_list,
                                                  period=7)
+        print("done.")
 
         print(f"Creating power-law data products for {self.case_type}s")
         power_law = cts.calculate_power_law_columns(df_to_transform=rolling_avg,
@@ -180,12 +195,22 @@ class CoronaAnalysis:
         df_total_new_cases = stacked.loc[(stacked.indicator == 'Total cases') |
                                          (stacked.indicator == 'New cases') |
                                          (stacked.indicator == 'Growth Rate')]
-        print(f"case_type: {self.case_type}\tdata_type: {self.data_type}")
+
         if self.data_type == 'world':
             pivoted = (df_total_new_cases
                        .set_index(['Date', 'Country/Region', 'Continent', 'Days'])
                        .pivot_table(values='value',
                                     index=['Date', 'Country/Region', 'Continent', 'Days'],
+                                    columns='indicator',
+                                    aggfunc='mean',
+                                    fill_value=0)
+                       .reset_index()
+                       )
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            pivoted = (df_total_new_cases
+                       .set_index(['Date', 'Province/State', 'Days'])
+                       .pivot_table(values='value',
+                                    index=['Date', 'Province/State', 'Days'],
                                     columns='indicator',
                                     aggfunc='mean',
                                     fill_value=0)
@@ -227,6 +252,22 @@ class CoronaAnalysis:
                                .groupby(['Country/Region', 'Continent'])['Date']
                                .transform(lambda x: (x - x.min()).dt.days)
                                )
+
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            # Need to fillna to 0s
+            df_to_stack.drop(columns={'Continent'}, inplace=True)
+            df_to_stack = df_to_stack.fillna(0)
+            stacked = (df_to_stack
+                       .set_index(['Date', 'Province/State'])
+                       .stack()
+                       .reset_index()
+                       )
+            stacked = stacked.rename(columns={"level_2": "indicator", 0: "value"})
+
+            stacked['Days'] = (stacked
+                               .groupby(['Province/State'])['Date']
+                               .transform(lambda x: (x - x.min()).dt.days)
+                               )
         else:
             # Need to fillna to 0s
             df_to_stack.drop(columns={'Continent'}, inplace=True)
@@ -266,6 +307,8 @@ class CoronaAnalysis:
                                                     axis=1
                                                     )
                                              )
+        elif self.data_type == 'aus':
+            df_add_continent['Continent'] = 'Australasia'
         else:
             df_add_continent['Continent'] = 'North America'
 
@@ -307,6 +350,16 @@ class CoronaAnalysis:
                     os.makedirs(write_path_deaths)
                     print(f'Writing data out to path: {write_path_deaths}')
                     df_to_write.to_csv(write_path_deaths+f'/{file_name}')
+        elif self.data_type == 'aus' and self.case_type == 'case':
+            write_path_cases = f"../data/output/aus/{self.processing_date}/cases/{path_to_write_to}"
+            if os.path.exists(write_path_cases):
+                print(f'Writing data out to path: {write_path_cases}')
+                df_to_write.to_csv(write_path_cases + f'/{file_name}')
+            else:
+                print(f"Making directory to write out to...")
+                os.makedirs(write_path_cases)
+                print(f'Writing data out to path: {write_path_cases}')
+                df_to_write.to_csv(write_path_cases + f'/{file_name}')
         else:
             if self.case_type == 'case':
                 write_path_cases = f"../data/output/usa/{self.processing_date}/cases/{path_to_write_to}"
