@@ -5,10 +5,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.express as px
-pd.set_option("display.max_columns", 500)
-pd.set_option("display.max_rows", 1000)
-pd.set_option("display.width", 1000)
+import plotly.graph_objects as go
+
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+debug = True
+
+if debug:
+    pd.set_option("display.max_columns", 500)
+    pd.set_option("display.max_rows", 1000)
+    pd.set_option("display.width", 1000)
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
@@ -120,21 +126,28 @@ def plot_animation(df_scatter: pd.DataFrame, case_type: str) -> px.scatter:
     :param df_scatter: A Pandas DataFrame to create the scatter plot with
     :return:
     """
+
     if case_type == 'world':
         df_scatter = df_scatter.groupby(['Country/Region', 'Date', 'Continent'], as_index=False).sum()
         color = "Continent"
         hover_name = "Country/Region"
         animation_group = "Country/Region"
+        range_x = [1, 3e6]
+        range_y = [1, 1e6]
     elif case_type == 'aus':
         df_scatter = df_scatter.groupby(['Province/State', 'Date'], as_index=False).sum()
         color = "Province/State"
         hover_name = "Province/State"
         animation_group = "Province/State"
+        range_x = [1, 50000]
+        range_y = [1, 1000]
     else:
         df_scatter = df_scatter.groupby(['Province_State', 'Date'], as_index=False).sum()
         color = "Province_State"
         hover_name = "Province_State"
         animation_group = "Province_State"
+        range_x = [1, 3e6]
+        range_y = [1, 1e6]
 
     df_scatter['growth_rate_clip'] = df_scatter['Growth Rate'].clip(lower=1)
 
@@ -148,24 +161,182 @@ def plot_animation(df_scatter: pd.DataFrame, case_type: str) -> px.scatter:
         'xanchor': 'center',
         'yanchor': 'top'}
 
-    return px.scatter(df_scatter, x="Total cases", y="New cases per day",
-                      animation_frame="Date", animation_group=animation_group,
+    return px.scatter(data_frame=df_scatter,
+                      x="Total cases",
+                      y="New cases per day",
+                      animation_frame="Date",
+                      animation_group=animation_group,
                       size="growth_rate_clip",
                       size_max=100,
                       color=color,
                       hover_name=hover_name,
                       log_x=True,
                       log_y=True,
-                      range_x=[1, 3e6],
-                      range_y=[1, 1e6],
+                      range_x=range_x,
+                      range_y=range_y,
                       title=title
                       )
+
+
+def plot_animation_aus(df_aus: pd.DataFrame) -> go.Figure:
+    """
+    Function to animate, with trailing lines showing (to better illustrate a power-law),
+     the cases of COVID-19 from Australia.  We need to do this manually,
+     by adding a trace object per state, so Australia is the only country for which I will do this.
+    :param df_aus: A Pandas DataFrame containing the data for Australia.
+    :return:
+    """
+    trace_vic = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Victoria']['Total cases'][:2],
+                           y=df_aus.loc[df_aus['Province/State'] == 'Victoria']['New cases'][:2],
+                           mode='lines',
+                           line=dict(width=1.5),
+                           name='Victoria'
+                           )
+
+    trace_nsw = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['Total cases'][:2],
+                           y=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases'][:2],
+                           mode='lines',
+                           line=dict(width=1.5),
+                           name='New South Wales'
+                           )
+    trace_sa = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'South Australia']['Total cases'][:2],
+                          y=df_aus.loc[df_aus['Province/State'] == 'South Australia']['New cases'][:2],
+                          mode='lines',
+                          line=dict(width=1.5),
+                          name='South Australia'
+                          )
+    trace_wa = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['Total cases'][:2],
+                          y=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['New cases'][:2],
+                          mode='lines',
+                          line=dict(width=1.5)
+                          )
+    trace_qld = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][:2],
+                           y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][:2],
+                           mode='lines',
+                           line=dict(width=1.5),
+                           name='Queensland'
+                           )
+    trace_tas = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['Total cases'][:2],
+                           y=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['New cases'][:2],
+                           mode='lines',
+                           line=dict(width=1.5),
+                           name='Tasmania'
+                           )
+    trace_nt = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['Total cases'][:2],
+                          y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['New cases'][:2],
+                          mode='lines',
+                          line=dict(width=1.5),
+                          name='Northern Territory'
+
+                          )
+    trace_act = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['Total cases'][:2],
+                           y=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['New cases'][:2],
+                           mode='lines',
+                           line=dict(width=1.5),
+                           name='Australian Capital Territory'
+                           )
+
+    frames = [dict(data=[dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'Victoria']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Victoria']['New cases'][:k + 1]),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases'][:k + 1]),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'South Australia']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'South Australia']['New cases'][:k + 1]
+                              ),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['New cases'][:k + 1]
+                              ),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][:k + 1]
+                              ),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['New cases'][:k + 1]
+                              ),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['New cases'][:k + 1]
+                              ),
+                         dict(type='scatter',
+                              x=df_aus.loc[df_aus['Province/State'] ==
+                                           'Australian Capital Territory']['Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] ==
+                                           'Australian Capital Territory']['New cases'][:k + 1]
+                              ),
+                         ],
+                   traces=[0, 1, 2, 3],
+                   # this means that frames[k]['data'][0] updates trace_vic,
+                   # and frames[k]['data'][1] updates trace_nsw
+                   ) for k in range(1, len(df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases']) - 1)]
+
+    layout = go.Layout(width=1600,
+                       height=800,
+                       showlegend=True,
+                       hovermode='closest',
+                       updatemenus=[dict(type='buttons', showactive=False,
+                                         y=1.05,
+                                         x=1.15,
+                                         xanchor='right',
+                                         yanchor='top',
+                                         pad=dict(t=0, r=10),
+                                         buttons=[dict(label='Play',
+                                                       method='animate',
+                                                       args=[None,
+                                                             dict(frame=dict(duration=3,
+                                                                             redraw=False),
+                                                                  transition=dict(duration=0),
+                                                                  fromcurrent=True,
+                                                                  mode='immediate')])])])
+
+    layout.update(xaxis=dict(range=[0, 5.0],
+                             autorange=False),
+                  yaxis=dict(range=[0, 3.1], autorange=False),
+                  xaxis_type="log",
+                  yaxis_type="log"
+                  )
+
+    sliders = [dict(steps=[dict(method='animate',
+                                args=[[f'frame{k + 1}'],  # HERE IS THE k^th FRAME NAME
+                                      dict(mode='immediate',
+                                           frame=dict(duration=3, redraw=False),
+                                           transition=dict(duration=0))
+                                      ],
+                                label=f'{k + 1}'  # label for each frame marked on the slider
+                                ) for k in range(1,
+                                                 len(df_aus.loc[df_aus['Province/State'] == 'New South Wales']
+                                                     ['New cases']) - 1)],
+                    active=1,
+                    transition=dict(duration=0),
+                    x=0,  # slider starting position
+                    y=0,
+                    currentvalue=dict(font=dict(size=12),
+                                      prefix='frame: ',
+                                      visible=True,
+                                      xanchor='center'
+                                      ),
+                    len=1.0)  # slider length
+               ]
+
+    fig = go.Figure(data=[trace_vic, trace_nsw, trace_sa, trace_wa, trace_qld,
+                          trace_tas, trace_nt, trace_act],
+                    frames=frames,
+                    layout=layout,
+                    )
+    fig.update_layout(sliders=sliders)
+
+    return fig
 
 
 # Create the animation figures
 fig_animated = plot_animation(pivoted_cases_df, 'world')
 fig_animated_usa = plot_animation(pivoted_usa_cases_df, 'usa')
-fig_animated_aus = plot_animation(pivoted_aus_cases_df, 'aus')
+# fig_animated_aus = plot_animation(pivoted_aus_cases_df, 'aus')
+fig_animated_aus = plot_animation_aus(pivoted_aus_cases_df)
 
 app.layout = html.Div(children=[
 
@@ -1023,4 +1194,4 @@ def update_usa_deaths_x_timeseries(hover_data, yaxis_column_name, axis_type):
 
 
 if __name__ == '__main__':
-    app.run_server(port=8499)
+    app.run_server(port=8489)
