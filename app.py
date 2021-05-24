@@ -128,12 +128,13 @@ def plot_animation(df_scatter: pd.DataFrame, case_type: str) -> px.scatter:
     """
 
     if case_type == 'world':
-        df_scatter = df_scatter.groupby(['Country/Region', 'Date', 'Continent'], as_index=False).sum()
+        df_scatter = df_scatter.groupby(['Country/Region', 'Date', 'Continent'],
+                                        as_index=False).sum()
         color = "Continent"
         hover_name = "Country/Region"
         animation_group = "Country/Region"
-        range_x = [1, 3e6]
-        range_y = [1, 1e6]
+        range_x = [1, 3e7]
+        range_y = [1, 1e7]
     elif case_type == 'aus':
         df_scatter = df_scatter.groupby(['Province/State', 'Date'], as_index=False).sum()
         color = "Province/State"
@@ -146,8 +147,8 @@ def plot_animation(df_scatter: pd.DataFrame, case_type: str) -> px.scatter:
         color = "Province_State"
         hover_name = "Province_State"
         animation_group = "Province_State"
-        range_x = [1, 3e6]
-        range_y = [1, 1e6]
+        range_x = [1, 3e7]
+        range_y = [1, 1e7]
 
     df_scatter['growth_rate_clip'] = df_scatter['Growth Rate'].clip(lower=1)
 
@@ -193,74 +194,94 @@ def plot_animation_aus(df_aus: pd.DataFrame) -> go.Figure:
                            name='Victoria'
                            )
 
-    trace_nsw = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['Total cases'][:2],
-                           y=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases'][:2],
-                           mode='lines',
-                           line=dict(width=1.5),
-                           name='New South Wales'
-                           )
-    trace_sa = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'South Australia']['Total cases'][:2],
-                          y=df_aus.loc[df_aus['Province/State'] == 'South Australia']['New cases'][:2],
-                          mode='lines',
-                          line=dict(width=1.5),
-                          name='South Australia'
-                          )
-    trace_wa = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['Total cases'][:2],
-                          y=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['New cases'][:2],
-                          mode='lines',
-                          line=dict(width=1.5)
-                          )
-    trace_qld = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][:2],
-                           y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][:2],
-                           mode='lines',
-                           line=dict(width=1.5),
-                           name='Queensland'
-                           )
+    trace_nsw = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5),
+        name='New South Wales'
+        )
+    trace_sa = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'South Australia']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'South Australia']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5),
+        name='South Australia'
+        )
+    trace_wa = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5)
+        )
+    trace_qld = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5),
+        name='Queensland'
+        )
     trace_tas = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['Total cases'][:2],
                            y=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['New cases'][:2],
                            mode='lines',
                            line=dict(width=1.5),
                            name='Tasmania'
                            )
-    trace_nt = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['Total cases'][:2],
-                          y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['New cases'][:2],
-                          mode='lines',
-                          line=dict(width=1.5),
-                          name='Northern Territory'
+    trace_nt = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5),
+        name='Northern Territory'
 
-                          )
-    trace_act = go.Scatter(x=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['Total cases'][:2],
-                           y=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['New cases'][:2],
-                           mode='lines',
-                           line=dict(width=1.5),
-                           name='Australian Capital Territory'
-                           )
+        )
+    trace_act = go.Scatter(
+        x=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['Total cases'][:2],
+        y=df_aus.loc[df_aus['Province/State'] == 'Australian Capital Territory']['New cases'][:2],
+        mode='lines',
+        line=dict(width=1.5),
+        name='Australian Capital Territory'
+        )
 
     frames = [dict(data=[dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'Victoria']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'Victoria']['New cases'][:k + 1]),
+                              x=df_aus.loc[df_aus['Province/State'] == 'Victoria']['Total cases'][
+                                :k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Victoria']['New cases'][
+                                :k + 1]),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases'][:k + 1]),
+                              x=df_aus.loc[df_aus['Province/State'] == 'New South Wales'][
+                                    'Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'New South Wales'][
+                                    'New cases'][:k + 1]),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'South Australia']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'South Australia']['New cases'][:k + 1]
+                              x=df_aus.loc[df_aus['Province/State'] == 'South Australia'][
+                                    'Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'South Australia'][
+                                    'New cases'][:k + 1]
                               ),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'Western Australia']['New cases'][:k + 1]
+                              x=df_aus.loc[df_aus['Province/State'] == 'Western Australia'][
+                                    'Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Western Australia'][
+                                    'New cases'][:k + 1]
                               ),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][:k + 1]
+                              x=df_aus.loc[df_aus['Province/State'] == 'Queensland']['Total cases'][
+                                :k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Queensland']['New cases'][
+                                :k + 1]
                               ),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['New cases'][:k + 1]
+                              x=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['Total cases'][
+                                :k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Tasmania']['New cases'][
+                                :k + 1]
                               ),
                          dict(type='scatter',
-                              x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['Total cases'][:k + 1],
-                              y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory']['New cases'][:k + 1]
+                              x=df_aus.loc[df_aus['Province/State'] == 'Northern Territory'][
+                                    'Total cases'][:k + 1],
+                              y=df_aus.loc[df_aus['Province/State'] == 'Northern Territory'][
+                                    'New cases'][:k + 1]
                               ),
                          dict(type='scatter',
                               x=df_aus.loc[df_aus['Province/State'] ==
@@ -272,7 +293,8 @@ def plot_animation_aus(df_aus: pd.DataFrame) -> go.Figure:
                    traces=[0, 1, 2, 3],
                    # this means that frames[k]['data'][0] updates trace_vic,
                    # and frames[k]['data'][1] updates trace_nsw
-                   ) for k in range(1, len(df_aus.loc[df_aus['Province/State'] == 'New South Wales']['New cases']) - 1)]
+                   ) for k in range(1, len(df_aus.loc[df_aus['Province/State'] ==
+                                                      'New South Wales']['New cases']) - 1)]
 
     layout = go.Layout(width=1600,
                        height=800,
@@ -308,7 +330,8 @@ def plot_animation_aus(df_aus: pd.DataFrame) -> go.Figure:
                                       ],
                                 label=f'{k + 1}'  # label for each frame marked on the slider
                                 ) for k in range(1,
-                                                 len(df_aus.loc[df_aus['Province/State'] == 'New South Wales']
+                                                 len(df_aus.loc[df_aus['Province/State'] ==
+                                                                'New South Wales']
                                                      ['New cases']) - 1)],
                     active=1,
                     transition=dict(duration=0),
@@ -353,11 +376,12 @@ app.layout = html.Div(children=[
         ),
 
         # Dashboard sub-heading
-        html.Div(children=f'A dashboard for visualising my analyses of the Johns Hopkins Univerisity\'s (JHUs)'
-                          f' corona-virus dataset.',
-                 style={
-                     'textAlign': 'center',
-                 }),
+        html.Div(
+            children=f'A dashboard for visualising my analyses of the Johns Hopkins '
+                     f'Univerisity\'s (JHUs) corona-virus dataset.',
+            style={
+                'textAlign': 'center',
+            }),
 
     ],
     ),
@@ -869,8 +893,10 @@ def update_cases_graph(xaxis_column_name, yaxis_column_name,
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Continent'] == i)]['value'],
             y=dff[(dff['Continent'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)]['Country/Region'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)]['Country/Region'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)][
+                'Country/Region'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)][
+                'Country/Region'],
             mode='markers',
             marker={
                 'size': 15,
@@ -916,9 +942,12 @@ def update_cases_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-yaxis-type', 'value')]
 )
 def update_cases_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = stacked_cases_df[stacked_cases_df['Country/Region'] == hover_data['points'][0]['customdata']]
+    dff = stacked_cases_df[
+        stacked_cases_df['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
+
+
 # END WORLD CASES callback functions
 
 
@@ -936,8 +965,10 @@ def update_deaths_graph(xaxis_column_name, yaxis_column_name,
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Continent'] == i)]['value'],
             y=dff[(dff['Continent'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)]['Country/Region'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)]['Country/Region'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)][
+                'Country/Region'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Continent'] == i)][
+                'Country/Region'],
             mode='markers',
             marker={
                 'size': 15,
@@ -983,9 +1014,12 @@ def update_deaths_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-deaths-yaxis-type', 'value')]
 )
 def update_deaths_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = stacked_deaths_df[stacked_deaths_df['Country/Region'] == hover_data['points'][0]['customdata']]
+    dff = stacked_deaths_df[
+        stacked_deaths_df['Country/Region'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
+
+
 # END WORLD DEATHS callback functions
 
 
@@ -1004,8 +1038,10 @@ def update_aus_cases_graph(xaxis_column_name, yaxis_column_name,
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Province/State'] == i)]['value'],
             y=dff[(dff['Province/State'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province/State'] == i)]['Province/State'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province/State'] == i)]['Province/State'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province/State'] == i)][
+                'Province/State'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province/State'] == i)][
+                'Province/State'],
             mode='markers',
             marker={
                 'size': 15,
@@ -1051,9 +1087,12 @@ def update_aus_cases_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-aus-cases-yaxis-type', 'value')]
 )
 def update_aus_cases_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = stacked_aus_cases_df[stacked_aus_cases_df['Province/State'] == hover_data['points'][0]['customdata']]
+    dff = stacked_aus_cases_df[
+        stacked_aus_cases_df['Province/State'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
+
+
 # END AUSTRALIA CASES callback functions
 
 
@@ -1072,8 +1111,10 @@ def update_usa_cases_graph(xaxis_column_name, yaxis_column_name,
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Province_State'] == i)]['value'],
             y=dff[(dff['Province_State'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)][
+                'Province_State'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)][
+                'Province_State'],
             mode='markers',
             marker={
                 'size': 15,
@@ -1119,9 +1160,12 @@ def update_usa_cases_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-us-cases-yaxis-type', 'value')]
 )
 def update_usa_cases_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = stacked_usa_cases_df[stacked_usa_cases_df['Province_State'] == hover_data['points'][0]['customdata']]
+    dff = stacked_usa_cases_df[
+        stacked_usa_cases_df['Province_State'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
+
+
 # END USA CASES callback functions
 
 
@@ -1140,8 +1184,10 @@ def update_usa_deaths_graph(xaxis_column_name, yaxis_column_name,
         'data': [dict(
             x=dff[(dff['indicator'] == xaxis_column_name) & (dff['Province_State'] == i)]['value'],
             y=dff[(dff['Province_State'] == i) & (dff['indicator'] == yaxis_column_name)]['value'],
-            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
-            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)]['Province_State'],
+            text=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)][
+                'Province_State'],
+            customdata=dff[(dff['indicator'] == yaxis_column_name) & (dff['Province_State'] == i)][
+                'Province_State'],
             mode='markers',
             marker={
                 'size': 15,
@@ -1187,11 +1233,14 @@ def update_usa_deaths_y_timeseries(hover_data, xaxis_column_name, axis_type):
      dash.dependencies.Input('crossfilter-us-deaths-yaxis-type', 'value')]
 )
 def update_usa_deaths_x_timeseries(hover_data, yaxis_column_name, axis_type):
-    dff = stacked_usa_deaths_df[stacked_usa_deaths_df['Province_State'] == hover_data['points'][0]['customdata']]
+    dff = stacked_usa_deaths_df[
+        stacked_usa_deaths_df['Province_State'] == hover_data['points'][0]['customdata']]
     dff = dff[dff['indicator'] == yaxis_column_name]
     return create_time_series(dff, axis_type, yaxis_column_name)
+
+
 # END USA DEATHS callback functions
 
 
 if __name__ == '__main__':
-    app.run_server(port=8489)
+    app.run_server(port=8389)

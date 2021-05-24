@@ -9,10 +9,6 @@ import requests
 import world_bank_data as wbd
 from us import states
 
-pd.set_option("display.max_columns", 500)
-pd.set_option("display.max_rows", 1000)
-pd.set_option("display.width", 1000)
-
 
 class CoronaTransformations:
 
@@ -29,7 +25,8 @@ class CoronaTransformations:
         countries = wbd.get_countries()
         population = wbd.get_series('SP.POP.TOTL', id_or_value='id', simplify_index=True, mrv=1)
         pop_df = \
-            countries[['region', 'name']].rename(columns={'name': 'country'}).loc[countries.region != 'Aggregates']
+            countries[['region', 'name']].rename(columns={'name': 'country'}).loc[
+                countries.region != 'Aggregates']
         pop_df['population'] = population
         pop_df.reset_index(inplace=True)
         return pop_df
@@ -46,14 +43,15 @@ class CoronaTransformations:
                 (key, val) = line.split()
                 census_api_key[key] = val
 
-        pop_query_url = f'https://api.census.gov/data/2019/pep/population?get=POP&for=state:*&key=' \
-                        f'{census_api_key["api_key"]}'
+        pop_query_url = f'https://api.census.gov/data/2019/pep/population?get=POP&for=state:' \
+                        f'*&key={census_api_key["api_key"]}'
         r_json = requests.get(pop_query_url).json()
 
         df_us_pop_by_state = pd.DataFrame(r_json[1:], columns=r_json[0])
         us_statecd_to_name = states.mapping(from_field='fips', to_field='name')
 
-        df_us_pop_by_state["State_name"] = df_us_pop_by_state["state"].apply(lambda x: us_statecd_to_name.get(x))
+        df_us_pop_by_state["State_name"] = df_us_pop_by_state["state"].apply(
+            lambda x: us_statecd_to_name.get(x))
         df_us_pop_by_state = df_us_pop_by_state[['State_name', 'state', 'POP']]
         df_us_pop_by_state.rename(columns={"state": "state_code"}, inplace=True)
         return df_us_pop_by_state
@@ -65,49 +63,50 @@ class CoronaTransformations:
         :return: the population of the country.
         """
         if cntry == 'Burma':
-            population = pop_df.loc[pop_df.country.str.contains('Myanmar')].population.item()
+            population = pop_df.loc[pop_df.country.str.contains('Myanmar')].population.iloc[0]
         elif cntry == 'China':
-            population = pop_df.loc[pop_df.country == 'China'].population.item()
+            population = pop_df.loc[pop_df.country == 'China'].population.iloc[0]
         elif cntry == 'Czechia':
-            population = pop_df.loc[pop_df.country == 'Czech Republic'].population.item()
+            population = pop_df.loc[pop_df.country == 'Czech Republic'].population.iloc[0]
         elif cntry == 'Dominican Republic':
-            population = pop_df.loc[pop_df.country == 'Dominican Republic'].population.item()
+            population = pop_df.loc[pop_df.country == 'Dominican Republic'].population.iloc[0]
         elif cntry == 'Dominica':
-            population = pop_df.loc[pop_df.country == 'Dominica'].population.item()
+            population = pop_df.loc[pop_df.country == 'Dominica'].population.iloc[0]
         elif cntry == 'Guinea':
-            population = pop_df.loc[pop_df.country == 'Guinea'].population.item()
+            population = pop_df.loc[pop_df.country == 'Guinea'].population.iloc[0]
         elif cntry == 'Guinea-Bissau':
-            population = pop_df.loc[pop_df.country == 'Guinea-Bissau'].population.item()
+            population = pop_df.loc[pop_df.country == 'Guinea-Bissau'].population.iloc[0]
         elif cntry == 'Equatorial Guinea':
-            population = pop_df.loc[pop_df.country == 'Equatorial Guinea'].population.item()
+            population = pop_df.loc[pop_df.country == 'Equatorial Guinea'].population.iloc[0]
         elif cntry == 'Papua New Guinea':
-            population = pop_df.loc[pop_df.country == 'Papua New Guinea'].population.item()
+            population = pop_df.loc[pop_df.country == 'Papua New Guinea'].population.iloc[0]
         elif cntry == 'Korea, South':
-            population = pop_df.loc[pop_df.country == 'Korea, Rep.'].population.item()
+            population = pop_df.loc[pop_df.country == 'Korea, Rep.'].population.iloc[0]
         elif cntry == 'Kyrgyzstan':
-            population = pop_df.loc[pop_df.country == 'Kyrgyz Republic'].population.item()
+            population = pop_df.loc[pop_df.country == 'Kyrgyz Republic'].population.iloc[0]
         elif cntry == 'Laos':
-            population = pop_df.loc[pop_df.country == 'Lao PDR'].population.item()
+            population = pop_df.loc[pop_df.country == 'Lao PDR'].population.iloc[0]
         elif cntry == 'Niger':
-            population = pop_df.loc[pop_df.country == 'Niger'].population.item()
+            population = pop_df.loc[pop_df.country == 'Niger'].population.iloc[0]
         elif cntry == 'Nigeria':
-            population = pop_df.loc[pop_df.country == 'Nigeria'].population.item()
+            population = pop_df.loc[pop_df.country == 'Nigeria'].population.iloc[0]
         elif cntry == 'Saint Kitts and Nevis':
-            population = pop_df.loc[pop_df.country == 'St. Kitts and Nevis'].population.item()
+            population = pop_df.loc[pop_df.country == 'St. Kitts and Nevis'].population.iloc[0]
         elif cntry == 'Saint Lucia':
-            population = pop_df.loc[pop_df.country == 'St. Lucia'].population.item()
+            population = pop_df.loc[pop_df.country == 'St. Lucia'].population.iloc[0]
         elif cntry == 'Saint Vincent and the Grenadines':
-            population = pop_df.loc[pop_df.country == 'St. Vincent and the Grenadines'].population.item()
+            population = \
+                pop_df.loc[pop_df.country == 'St. Vincent and the Grenadines'].population.iloc[0]
         elif cntry == 'Slovakia':
-            population = pop_df.loc[pop_df.country == 'Slovak Republic'].population.item()
+            population = pop_df.loc[pop_df.country == 'Slovak Republic'].population.iloc[0]
         elif cntry == 'Sudan':
-            population = pop_df.loc[pop_df.country == 'Sudan'].population.item()
+            population = pop_df.loc[pop_df.country == 'Sudan'].population.iloc[0]
         elif cntry == 'South Sudan':
-            population = pop_df.loc[pop_df.country == 'South Sudan'].population.item()
+            population = pop_df.loc[pop_df.country == 'South Sudan'].population.iloc[0]
         elif cntry == 'US':
-            population = pop_df.loc[pop_df.country == 'United States'].population.item()
+            population = pop_df.loc[pop_df.country == 'United States'].population.iloc[0]
         else:
-            population = pop_df.loc[pop_df.country.str.contains(cntry)].population.item()
+            population = pop_df.loc[pop_df.country.str.contains(cntry)].population.iloc[0]
 
         return population / 1000000.0
 
@@ -132,11 +131,14 @@ class CoronaTransformations:
         elif state == 'Virgin Islands':
             population = 106977.0
         elif state == 'Virginia':
-            population = float(us_state_pop_df.loc[us_state_pop_df.State_name == 'Virginia'].POP.item())
+            population = float(
+                us_state_pop_df.loc[us_state_pop_df.State_name == 'Virginia'].POP.iloc[0])
         elif state == 'West Virginia':
-            population = float(us_state_pop_df.loc[us_state_pop_df.State_name == 'West Virginia'].POP.item())
+            population = float(
+                us_state_pop_df.loc[us_state_pop_df.State_name == 'West Virginia'].POP.iloc[0])
         else:
-            population = float(us_state_pop_df.loc[us_state_pop_df.State_name.str.contains(state)].POP.item())
+            population = float(
+                us_state_pop_df.loc[us_state_pop_df.State_name.str.contains(state)].POP.iloc[0])
 
         return population / 1000000.0
 
@@ -148,7 +150,8 @@ class CoronaTransformations:
         :param state: The state whose population is requested
         :return: The popluation of the requesite state.
         """
-        return aus_state_pop_df.loc[aus_state_pop_df['Province/State'] == state].population.item() / 1000000.0
+        return aus_state_pop_df.loc[
+                   aus_state_pop_df['Province/State'] == state].population.item() / 1000000.0
 
     def create_cases_per_day(self, df_to_transform, groupby_list) -> pd.DataFrame:
         """
@@ -165,49 +168,55 @@ class CoronaTransformations:
         if self.data_type == 'world':
             pop_df = self.get_wbd_population()
 
-            total_cases_df['css_per_prsn'] = (total_cases_df
-                                              .apply(lambda x: x.total_cases / self.get_ctry_pop(pop_df=pop_df,
-                                                                                                 cntry=x[
-                                                                                                     'Country/Region']),
-                                                     axis=1)
-                                              )
+            total_cases_df['css_per_prsn'] = (total_cases_df.apply(
+                lambda x: x.total_cases / self.get_ctry_pop(pop_df=pop_df,
+                                                            cntry=x[
+                                                                'Country/Region']),
+                axis=1)
+            )
         elif self.data_type == 'aus':
 
-            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
-                                               "Australian Capital Territory", "South Australia",
-                                               "Western Australia", "Northern Territory"],
-                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
-                            }
+            aus_pop_dict = {
+                "Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                   "Australian Capital Territory", "South Australia",
+                                   "Western Australia", "Northern Territory"],
+                "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000,
+                               244300]
+            }
 
             aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
 
-            total_cases_df['css_per_prsn'] = (total_cases_df
-                                              .apply(lambda x: x.total_cases / self
-                                                     .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
-                                                                        state=x['Province/State']),
-                                                     axis=1)
-                                              )
+            total_cases_df['css_per_prsn'] = \
+                (total_cases_df
+                 .apply(lambda x: x.total_cases / self.get_aus_state_pop(
+                    aus_state_pop_df=aus_state_pop_df,
+                    state=x['Province/State']),
+                                      axis=1
+                        )
+                 )
         else:
             us_states_pop_df = self.get_us_state_population()
 
-            total_cases_df['css_per_prsn'] = (total_cases_df
-                                              .apply(lambda x: x.total_cases / self
-                                                     .get_usa_state_pop(us_state_pop_df=us_states_pop_df,
-                                                                        state=x['Province_State']),
-                                                     axis=1)
-                                              )
+            total_cases_df['css_per_prsn'] = \
+                (total_cases_df.apply(lambda x: x.total_cases / self.get_usa_state_pop(
+                    us_state_pop_df=us_states_pop_df,
+                    state=x['Province_State']),
+                                      axis=1)
+                 )
         total_cases_df = total_cases_df.rename(columns={"total_cases": "Total cases",
                                                         "css_per_prsn": "Total cases per million"})
 
         return total_cases_df
 
-    def create_cases_per_period(self, df_to_transform, groupby_list, case_column: str) -> pd.DataFrame:
+    def create_cases_per_period(self, df_to_transform, groupby_list,
+                                case_column: str) -> pd.DataFrame:
         """
         Method to create a cases/time-period column in a Pandas DataFrame.
         :param groupby_list:
         :param df_to_transform:
         :param case_column: A string denoting which column to aggregate over the period `period`.
-        :return: A Pandas DataFrame containing a column caled `new_cases` that contains an aggregate over
+        :return: A Pandas DataFrame containing a column caled `new_cases` that
+        contains an aggregate over
         period `period` of column `case_column`.
         """
 
@@ -221,38 +230,41 @@ class CoronaTransformations:
         if self.data_type == 'world':
             pop_df = self.get_wbd_population()
 
-            df_to_transform['new_css_per_prsn'] = (df_to_transform
-                                                   .apply(lambda x: x['New cases'] / self
-                                                          .get_ctry_pop(pop_df=pop_df,
-                                                                        cntry=x['Country/Region']),
-                                                          axis=1)
-                                                   )
+            df_to_transform['new_css_per_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases'] / self.get_ctry_pop(
+                    pop_df=pop_df,
+                    cntry=x['Country/Region']),
+                                       axis=1)
+                 )
         elif self.data_type == 'aus':
 
-            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
-                                               "Australian Capital Territory", "South Australia",
-                                               "Western Australia", "Northern Territory"],
-                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
-                            }
+            aus_pop_dict = {
+                "Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                   "Australian Capital Territory", "South Australia",
+                                   "Western Australia", "Northern Territory"],
+                "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000,
+                               244300]
+            }
 
             aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
 
-            df_to_transform['css_per_prsn'] = (df_to_transform
-                                               .apply(lambda x: x['New cases'] / self
-                                                      .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
-                                                                         state=x['Province/State']),
-                                                      axis=1)
-                                               )
+            df_to_transform['css_per_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases'] / self.get_aus_state_pop(
+                    aus_state_pop_df=aus_state_pop_df,
+                    state=x['Province/State']),
+                                       axis=1)
+                 )
         else:
             us_states_pop_df = self.get_us_state_population()
 
-            df_to_transform['new_css_per_prsn'] = (df_to_transform
-                                                   .apply(lambda x: x['New cases'] / self.get_usa_state_pop(
-                                                                        us_state_pop_df=us_states_pop_df,
-                                                                        state=x['Province_State']),
-                                                          axis=1)
-                                                   )
-        df_to_transform = df_to_transform.rename(columns={"new_css_per_prsn": "New cases per million"})
+            df_to_transform['new_css_per_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases'] / self.get_usa_state_pop(
+                    us_state_pop_df=us_states_pop_df,
+                    state=x['Province_State']),
+                                       axis=1)
+                 )
+        df_to_transform = df_to_transform.rename(
+            columns={"new_css_per_prsn": "New cases per million"})
         return df_to_transform
 
     def create_rolling_average(self, df_to_transform, groupby_list, period: int):
@@ -264,38 +276,41 @@ class CoronaTransformations:
 
         if self.data_type == 'world':
             pop_df = self.get_wbd_population()
-            df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
-                                                      .apply(lambda x: x['New cases per week'] / self
-                                                             .get_ctry_pop(pop_df=pop_df,
-                                                                           cntry=x['Country/Region']),
-                                                             axis=1)
-                                                      )
+            df_to_transform['new_css_per_wk_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases per week'] / self.get_ctry_pop(
+                    pop_df=pop_df,
+                    cntry=x['Country/Region']),
+                                       axis=1)
+                 )
         elif self.data_type == 'aus':
 
-            aus_pop_dict = {"Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
-                                               "Australian Capital Territory", "South Australia",
-                                               "Western Australia", "Northern Territory"],
-                            "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000, 244300]
-                            }
+            aus_pop_dict = {
+                "Province/State": ["Victoria", "New South Wales", "Queensland", "Tasmania",
+                                   "Australian Capital Territory", "South Australia",
+                                   "Western Australia", "Northern Territory"],
+                "population": [6359000.0, 7544000, 5071000, 515000, 380000, 1677000, 2589000,
+                               244300]
+            }
 
             aus_state_pop_df = pd.DataFrame.from_dict(aus_pop_dict)
 
-            df_to_transform['css_per_prsn'] = (df_to_transform
-                                               .apply(lambda x: x['New cases'] / self
-                                                      .get_aus_state_pop(aus_state_pop_df=aus_state_pop_df,
-                                                                         state=x['Province/State']),
-                                                      axis=1)
-                                               )
+            df_to_transform['css_per_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases'] / self.get_aus_state_pop(
+                    aus_state_pop_df=aus_state_pop_df,
+                    state=x['Province/State']),
+                                       axis=1)
+                 )
         else:
             us_states_pop_df = self.get_us_state_population()
 
-            df_to_transform['new_css_per_wk_prsn'] = (df_to_transform
-                                                      .apply(lambda x: x['New cases per week'] / self.get_usa_state_pop(
-                                                                           us_state_pop_df=us_states_pop_df,
-                                                                           state=x['Province_State']),
-                                                             axis=1)
-                                                      )
-        df_to_transform = df_to_transform.rename(columns={"new_css_per_wk_prsn": "New cases per week per million"})
+            df_to_transform['new_css_per_wk_prsn'] = \
+                (df_to_transform.apply(lambda x: x['New cases per week'] / self.get_usa_state_pop(
+                    us_state_pop_df=us_states_pop_df,
+                    state=x['Province_State']),
+                                       axis=1)
+                 )
+        df_to_transform = df_to_transform.rename(
+            columns={"new_css_per_wk_prsn": "New cases per week per million"})
 
         return df_to_transform
 
@@ -350,9 +365,9 @@ class CoronaTransformations:
                                          rise: str,
                                          run: str) -> pd.DataFrame:
         """
-        Method to calculate the `slope of the slope` of a line, which can be thought of as being analogous to
-        the acceleration of the rate-of-change of the line in a power-law (in this sense is how I am implementing
-        it).
+        Method to calculate the `slope of the slope` of a line, which can be thought of as
+        being analogous to the acceleration of the rate-of-change of the line in a power-law
+        (in this sense is how I am implementing it).
         :param df_to_transform:
         :param period: The period over which to average the speed.
         :param groupby_list: The columns in the DataFrame over which to group to take the speed.
@@ -361,13 +376,15 @@ class CoronaTransformations:
         :return: A Pandas DataFrame containing the slope of two columns
         """
         return self.calculate_power_law_slope(df_to_transform=df_to_transform,
-                                              period=period, groupby_list=groupby_list, rise=rise, run=run)
+                                              period=period, groupby_list=groupby_list, rise=rise,
+                                              run=run)
 
-    def calculate_growth_rate(self, df_to_transform: pd.DataFrame, period: int, groupby_list: list, new_cases: str,
+    def calculate_growth_rate(self, df_to_transform: pd.DataFrame, period: int, groupby_list: list,
+                              new_cases: str,
                               total_cases: str) -> pd.DataFrame:
         """
-        Method by which to calculate the growth rate of cases. This is essentially the percentage of `total_cases`
-        that the `new_cases` represents.
+        Method by which to calculate the growth rate of cases. This is essentially the percentage
+        of `total_cases` that the `new_cases` represents.
         :param df_to_transform:
         :param period: The period over which to average the growth rate.
         :param groupby_list: The columns in the DataFrame over which to group to take the slope.
@@ -407,7 +424,8 @@ class CoronaTransformations:
         return df_to_transform
 
     @staticmethod
-    def calculate_doubling_time(df_to_transform: pd.DataFrame, period: int, groupby_list: list) -> pd.DataFrame:
+    def calculate_doubling_time(df_to_transform: pd.DataFrame, period: int,
+                                groupby_list: list) -> pd.DataFrame:
         """
 
         :param df_to_transform:
@@ -419,12 +437,11 @@ class CoronaTransformations:
                                                     .groupby(groupby_list)['Date']
                                                     .transform(lambda x: (x - x.min()).dt.days)
                                                     )
-        df_to_transform['Average Growth Rate'] = (df_to_transform
-                                                  .groupby(groupby_list)['Growth Rate']
-                                                  .transform(lambda x: np.log(2) / (np.log(1) +
-                                                                                    x.rolling(period).mean())
-                                                             )
-                                                  )
+        df_to_transform['Average Growth Rate'] = \
+            (df_to_transform
+             .groupby(groupby_list)['Growth Rate']
+             .transform(lambda x: np.log(2) / (np.log(1) + x.rolling(period).mean()))
+             )
 
         df_to_transform['Doubling time'] = (df_to_transform['Average Growth Rate'] *
                                             df_to_transform['Days since first case'])
